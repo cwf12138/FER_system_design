@@ -22,6 +22,6 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     form = QtWidgets.QMainWindow()
     model = load_cnn_model()
-    ui = UI(form, model)
+    ui = UI(form, model)   #穿主窗口以及训练的模型，这个地方就是可以操作的，可以让其他的按键来调用这个窗口界面（大概）
     form.show()
     sys.exit(app.exec_())

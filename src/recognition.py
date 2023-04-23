@@ -62,7 +62,7 @@ def generate_faces(face_img, img_size=48):
     return resized_images
 
 
-def predict_expression(img_path, model):
+def predict_expression(img_path, model):    #这个部分是最重要的，这里体现了数据的来源
     """
     对图中n个人脸进行表情预测
     :param img_path:
