@@ -6,7 +6,7 @@ desc: 用于图片预处理，神经网络没有用到这部分
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
-# import dlib
+import dlib   #原文是将这个给注释了的
 
 
 def add_noise(input_data):

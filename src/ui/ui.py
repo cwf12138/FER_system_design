@@ -16,8 +16,9 @@ class UI(object):
 
     def setup_ui(self, form):
         form.setObjectName("Form")
-        form.resize(1200, 800)
+        form.resize(1200, 800)   #大小
         # 原图无图时显示的label
+        #懂了，就是左上部分那个深灰色小方框
         self.label_raw_pic = QtWidgets.QLabel(form)
         self.label_raw_pic.setGeometry(QtCore.QRect(10, 30, 320, 240))
         self.label_raw_pic.setStyleSheet("background-color:#bbbbbb;")
@@ -81,18 +82,19 @@ class UI(object):
         self.pushButton_select_img.clicked.connect(self.open_file_browser)
         self.retranslate_ui(form)
         QtCore.QMetaObject.connectSlotsByName(form)
+        #上方部分就是初始化ui界面，将整个方框的布局弄出来
 
     def retranslate_ui(self, form):
         _translate = QtCore.QCoreApplication.translate
         form.setWindowTitle(_translate("Form", "Form"))
         self.label_raw_pic.setText(_translate("Form", "O(∩_∩)O"))
-        self.label_designer.setText(_translate("Form", "designed by wss"))
+        self.label_designer.setText(_translate("Form", "designed by gzu-cwf"))
         self.pushButton_select_img.setText(_translate("Form", "选择图像"))
         self.label_result.setText(_translate("Form", "识别结果"))
         self.label_emotion.setText(_translate("Form", "null"))
         self.label_bar.setText(_translate("Form", "概率直方图"))
         self.label_rst.setText(_translate("Form", "Result"))
-
+    #添加文字信息
     def open_file_browser(self):
         # 加载模型
         file_name, file_type = QtWidgets.QFileDialog.getOpenFileName(caption="选取图片", directory="./input/test/",
@@ -100,23 +102,23 @@ class UI(object):
         # 显示原图
         if file_name is not None and file_name != "":
             self.show_raw_img(file_name)
-            emotion, possibility = predict_expression(file_name, self.model)
+            emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
             self.show_results(emotion, possibility)
 
-    def show_raw_img(self, filename):
+    def show_raw_img(self, filename):   #这个部分就是显示图片
         img = cv2.imread(filename)
         frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240))
         self.label_raw_pic.setPixmap(QtGui.QPixmap.fromImage(
                     QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
                                  QtGui.QImage.Format_RGB888)))
 
-    def show_results(self, emotion, possibility):
+    def show_results(self, emotion, possibility):  #展示结果
         # 显示表情名
         self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
         # 显示emoji
         if emotion != 'no':
-            img = cv2.imread('./assets/icons/' + str(emotion) + '.png')
-            frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (100, 100))
+            img = cv2.imread('./assets/icons/' + str(emotion) + '.png')    #这里是iemoji表情的路径
+            frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (100, 100))  #修改大小
             self.label_rst.setPixmap(QtGui.QPixmap.fromImage(
                 QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
                              QtGui.QImage.Format_RGB888)))
@@ -125,7 +127,7 @@ class UI(object):
         # 显示直方图
         self.show_bars(list(possibility))
 
-    def show_bars(self, possbility):
+    def show_bars(self, possbility):  #概率直方图
         dr = MyFigureCanvas()
         dr.draw_(possbility)
         graphicscene = QtWidgets.QGraphicsScene()
@@ -133,7 +135,7 @@ class UI(object):
         self.graphicsView.setScene(graphicscene)
         self.graphicsView.show()
 
-    def get_faces_from_image(self, img_path):
+    def get_faces_from_image(self, img_path):   #这里是人脸检测，但是不知道为什么没有用到这个函数
         """
         获取图片中的人脸
         :param img_path:
@@ -151,7 +153,7 @@ class UI(object):
         return faces_gray
 
 
-class MyFigureCanvas(FigureCanvas):
+class MyFigureCanvas(FigureCanvas):   #继承FigureCanvas 并调整条形图的显示
 
     def __init__(self, parent=None, width=8, height=5, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
