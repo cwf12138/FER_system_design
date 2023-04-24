@@ -5,12 +5,21 @@ desc: 利用摄像头实时检测
 """
 import os
 import argparse
+import sys
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import cv2
 import numpy as np
 from model import CNN2, CNN3
 from utils import index2emotion, cv2_img_add_text
 from blazeface import blaze_detect
+
+
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
+from PyQt5.QtCore import QObject, pyqtSignal
+
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--source", type=int, default=0, help="data source, 0 for camera 1 for video")
@@ -56,6 +65,33 @@ def generate_faces(face_img, img_size=48):
     return resized_images
 
 
+
+class App(QMainWindow):
+    def __init__(self,video_capture, parent=None):
+        super().__init__()
+        self.title = 'Face Recognition'
+        self.left = 100
+        self.top = 100
+        self.width = 640
+        self.height = 480
+        self.video_capture = video_capture
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+
+        # 创建标签，用于显示视频流
+        self.label = QLabel(self)
+        self.label.setGeometry(10, 10, 640, 480)
+        self.show()
+    def closeEvent(self, event):
+        # 触发信号
+        # 关闭窗口
+        self.video_capture.release()
+        #cv2.destroyAllWindows()
+        event.accept()
+
 def predict_expression():
     """
     实时预测
@@ -67,6 +103,8 @@ def predict_expression():
     border_color = (0, 0, 0)  # 黑框框
     font_color = (255, 255, 255)  # 白字字
     capture = cv2.VideoCapture(0)  # 指定0号摄像头
+    app = QApplication(sys.argv)
+    ex = App(capture)
     if filename:
         capture = cv2.VideoCapture(filename)
 
@@ -91,17 +129,28 @@ def predict_expression():
                 frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
                 # puttext中文显示问题
                 # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
+        qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
+        # 将 QImage 对象转换为 QPixmap 对象
+        pixmap = QPixmap.fromImage(qImg)
+        # 在标签上显示图像
+        ex.label.setPixmap(pixmap)
+
+        # 每 25 毫秒刷新一次界面
+        QApplication.processEvents()
+        #cv2.waitKey(25)
         #cv2.imshow("expression recognition(press esc to exit)", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 利用人眼假象，这里是展示环节
-        frame=cv2.cvtColor(frame,cv2.COLOR_HSV2BGR)
-        return frame
-        #key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
+        #frame=cv2.cvtColor(frame,cv2.COLOR_HSV2BGR)
+        #return frame
+        key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
                                          
         # 如果输入esc则退出循环
-        #if key == 27:
-            #break
+        if key == 27:
+            break
     #capture.release()  # 释放摄像头
     #cv2.destroyAllWindows()  # 销毁窗口
+    #sys.exit(app.exec_())
     #return frame
+
 
 if __name__ == '__main__':
     predict_expression()
