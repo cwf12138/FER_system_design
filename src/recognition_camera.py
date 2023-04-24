@@ -18,7 +18,7 @@ parser.add_argument("--video_path", type=str, default=None)
 opt = parser.parse_args()
 
 if opt.source == 1 and opt.video_path is not None:
-    filename = opt.video_path
+    filename = opt.video_path     #这里判断是否在线还是离线操作
 else:
     filename = None
 
@@ -84,17 +84,17 @@ def predict_expression():
                 face = frame_gray[y: y + h, x: x + w]  # 脸部图片
                 faces = generate_faces(face)
                 results = model.predict(faces)
-                result_sum = np.sum(results, axis=0).reshape(-1)
+                result_sum = np.sum(results, axis=0).reshape(-1) #这里也可以加一个概率统计 ，frame 和 possibilities
                 label_index = np.argmax(result_sum, axis=0)
-                emotion = index2emotion(label_index)
+                emotion = index2emotion(label_index)  #*这里可以注意一下
                 cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
-                frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)
+                frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
                 # puttext中文显示问题
                 # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
-        cv2.imshow("expression recognition(press esc to exit)", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 利用人眼假象
+        cv2.imshow("expression recognition(press esc to exit)", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 利用人眼假象，这里是展示环节
 
         key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
-
+                                         
         # 如果输入esc则退出循环
         if key == 27:
             break

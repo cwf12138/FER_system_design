@@ -94,7 +94,7 @@ def predict_expression(img_path, model):    #这个部分是最重要的，这�
     if not os.path.exists("./output"):
         os.makedirs("./output")
     cv2.imwrite('./output/rst.png', img)
-    return emotions[0], result_possibilitys[0]
+    return emotions[0], result_possibilitys[0]  #这个地方就是可以传递数据的，在这个地方下手
 
 
 if __name__ == '__main__':
