@@ -91,16 +91,17 @@ def predict_expression():
                 frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
                 # puttext中文显示问题
                 # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
-        cv2.imshow("expression recognition(press esc to exit)", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 利用人眼假象，这里是展示环节
-
-        key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
+        #cv2.imshow("expression recognition(press esc to exit)", cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 利用人眼假象，这里是展示环节
+        frame=cv2.cvtColor(frame,cv2.COLOR_HSV2BGR)
+        return frame
+        #key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
                                          
         # 如果输入esc则退出循环
-        if key == 27:
-            break
-    capture.release()  # 释放摄像头
-    cv2.destroyAllWindows()  # 销毁窗口
-
+        #if key == 27:
+            #break
+    #capture.release()  # 释放摄像头
+    #cv2.destroyAllWindows()  # 销毁窗口
+    #return frame
 
 if __name__ == '__main__':
     predict_expression()
