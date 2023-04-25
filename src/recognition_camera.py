@@ -16,7 +16,7 @@ from blazeface import blaze_detect
 
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget
-from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer
+from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize
 
 
 
@@ -87,6 +87,8 @@ class App(QWidget):
         self.timer.timeout.connect(self.predict_expression_test)   
         # 创建一个标签用于显示视频流
         self.label_video = QLabel(self)
+        #self.label_video.setMinimumSize(640, 480)  # 设置最小大小
+        self.label_video.setMaximumSize(800, 600) 
         self.label_video.setAlignment(Qt.AlignCenter)
         # 创建标签，用于显示视频流
         #self.label = QLabel(self)
@@ -113,24 +115,21 @@ class App(QWidget):
         # 打开视频流
         #self.cap = cv2.VideoCapture(0)
         self.capture = cv2.VideoCapture(0)  # 指定0号摄像头
+        if filename:
+            self.capture = cv2.VideoCapture(filename)
         self.timer.start(30)
         #居中显示
         qtRectangle = self.frameGeometry()
         centerPoint = QDesktopWidget().availableGeometry().center()
         qtRectangle.moveCenter(centerPoint)
         self.move(qtRectangle.topLeft())
-        self.show()
-    def predict_expression_test(self):   #测试暂停键和关闭键是否成功
-
+        #self.show()
+    def predict_expression_test(self):   #测试暂停键和关闭键是否成功,已成功
         #model = load_model()
-
         border_color = (0, 0, 0)  # 黑框框
         font_color = (255, 255, 255)  # 白字字
-        #capture = cv2.VideoCapture(0)  # 指定0号摄像头
-        #app = QApplication(sys.argv)
-        #ex = App(capture)
-        if filename:
-            self.capture = cv2.VideoCapture(filename)
+        #if filename:
+            #self.capture = cv2.VideoCapture(filename)
         
         _, frame = self.capture.read()  # 读取一帧视频，返回是否到达视频结尾的布尔值和这一帧的图像
             #frame = cv2.cvtColor(cv2.resize(frame, (800, 600)), cv2.COLOR_BGR2RGB)
@@ -157,13 +156,6 @@ class App(QWidget):
         pixmap = QPixmap.fromImage(qImg)
             # 在标签上显示图像
         self.label_video.setPixmap(pixmap)
-        #key = cv2.waitKey(30)  # 等待30ms，返回ASCII码
-                                            
-            # 如果输入esc则退出循环
-        #capture.release()  # 释放摄像头
-        #cv2.destroyAllWindows()  # 销毁窗口
-        #sys.exit(app.exec_())
-        #return frame
     def play_pause_video(self):
         """开始/暂停视频流的播放"""
         if not self.timer.isActive():
@@ -255,7 +247,7 @@ def predict_expression():
 if __name__ == '__main__':
     #predict_expression()
     app = QApplication(sys.argv)
-    model = load_model()
+    model = load_model()  #导入模型，提出来，不然循环每次都导入会报内存的
     ex = App(model)
     ex.show()
     app.exec_()
