@@ -85,7 +85,7 @@ def predict_expression(img_path, model):    #这个部分是最重要的，这�
         results = model.predict(faces_img_gray)
         result_sum = np.sum(results, axis=0).reshape(-1)
         label_index = np.argmax(result_sum, axis=0)
-        emotion = index2emotion(label_index, 'en')
+        emotion = index2emotion(label_index, 'en')  #本来就是显示的英文
         
         cv2.rectangle(img, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
         img = cv2_img_add_text(img, emotion, x + 30, y + 30, font_color, 20)
@@ -94,8 +94,9 @@ def predict_expression(img_path, model):    #这个部分是最重要的，这�
     if not os.path.exists("./output"):
         os.makedirs("./output")
     cv2.imwrite('./output/rst.png', img)
-    return emotions[0], result_possibilitys[0]  #这个地方就是可以传递数据的，在这个地方下手
-
+    #print(str(emotions[0])+'ffff')
+    return emotions[0], result_possibilitys[0]  #这个地方就是可以传递数据的，在这个地方下手  这里传递的是第一个图像观察到的人脸图像
+                                                #但是这里的img会随着遍历进行改变，那img应该就是最后一个人脸而已，这里应该是有问题的,result_possibility是一个列表
 
 if __name__ == '__main__':
     from model import CNN3

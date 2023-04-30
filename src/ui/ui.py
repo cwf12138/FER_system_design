@@ -17,12 +17,11 @@ class UI(object):
     def setup_ui(self, form):
         form.setObjectName("Form")
         form.resize(1200, 800)   #大小
-        # 原图无图时显示的label
-        #懂了，就是左上部分那个深灰色小方框
+        # 原图无图时显示的label      #懂了，就是左上部分那个深灰色小方框
         self.label_raw_pic = QtWidgets.QLabel(form)
         self.label_raw_pic.setGeometry(QtCore.QRect(10, 30, 320, 240))
         self.label_raw_pic.setStyleSheet("background-color:#bbbbbb;")
-        self.label_raw_pic.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_raw_pic.setAlignment(QtCore.Qt.AlignCenter)      #居中
         self.label_raw_pic.setObjectName("label_raw_pic")
         # 原图下方分割线
         self.line1 = QtWidgets.QFrame(form)
@@ -101,19 +100,21 @@ class UI(object):
                                                                      filter="All Files (*);;Text Files (*.txt)")
         # 显示原图
         if file_name is not None and file_name != "":
-            self.show_raw_img(file_name)
+            self.show_raw_img(file_name)  
             emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
-            self.show_results(emotion, possibility)
+           # print(emotion)  这里已经是英文了
+            self.show_results(emotion, possibility)  
 
-    def show_raw_img(self, filename):   #这个部分就是显示图片
+    def show_raw_img(self, filename):   #这个部分就是显示图片并更改了大小   #?这个部分是值得参考的，hh
         img = cv2.imread(filename)
-        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240))
+        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小
         self.label_raw_pic.setPixmap(QtGui.QPixmap.fromImage(
-                    QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
-                                 QtGui.QImage.Format_RGB888)))
+                    QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))  
+                                        #这里相当于就是显示图片
 
-    def show_results(self, emotion, possibility):  #展示结果
+    def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
         # 显示表情名
+        #print(emotion)
         self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
         # 显示emoji
         if emotion != 'no':
@@ -123,7 +124,7 @@ class UI(object):
                 QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
                              QtGui.QImage.Format_RGB888)))
         else:
-            self.label_rst.setText(QtCore.QCoreApplication.translate("Form", "no result"))
+            self.label_rst.setText(QtCore.QCoreApplication.translate("Form", "no result"))  #翻译
         # 显示直方图
         self.show_bars(list(possibility))
 

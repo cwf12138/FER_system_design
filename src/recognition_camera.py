@@ -156,9 +156,10 @@ class App(QWidget):
                     # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
         qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
             # 将 QImage 对象转换为 QPixmap 对象
-        pixmap = QPixmap.fromImage(qImg)
+        #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
+        pixmap = QPixmap.fromImage(qImg)    
             # 在标签上显示图像
-        self.label_video.setPixmap(pixmap)
+        self.label_video.setPixmap(pixmap)   
     def play_pause_video(self):
         """开始/暂停视频流的播放"""
         if not self.timer.isActive():

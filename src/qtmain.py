@@ -50,7 +50,7 @@ class Window(QMainWindow):
         button2.clicked.connect(self.show_page1)
         layout2.addWidget(button2)
         #判断当前Qwidget是否在stacked_widget里面
-        if(self.stacked_widget.indexOf(self.page2)==-1):  
+        if(self.stacked_widget.indexOf(self.page2)==-1):   
             self.stacked_widget.addWidget(self.page2)
         #self.stacked_widget.addWidget(self.page2)
         self.stacked_widget.setCurrentWidget(self.page2)
@@ -60,10 +60,10 @@ class Window(QMainWindow):
     def show_page1(self):
         # 切换到页面2
         #self.stacked_widget.setCurrentWidget(self.page1)
-        current_widget_index = self.stacked_widget.currentIndex()
-        widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)
-        widget_to_remove.deleteLater()
+        current_widget_index = self.stacked_widget.currentIndex()  
+        widget_to_remove = self.stacked_widget.widget(current_widget_index) 
+        self.stacked_widget.removeWidget(widget_to_remove) 
+        widget_to_remove.deleteLater()  #最后，使用 deleteLater() 方法释放 QWidget 的内存。
         self.stacked_widget.setCurrentWidget(self.page1)
         current_widget_index = self.stacked_widget.currentIndex()
         print(current_widget_index)
