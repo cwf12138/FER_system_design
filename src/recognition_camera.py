@@ -67,7 +67,7 @@ def generate_faces(face_img, img_size=48):
 
 #QMainWindow
 class App(QWidget):
-    def __init__(self,model, parent=None):
+    def __init__(self,model,filename=None, parent=None):
         super().__init__()
         self.title = 'Face Recognition'
         self.left = 0
@@ -88,7 +88,7 @@ class App(QWidget):
         # 创建一个标签用于显示视频流
         self.label_video = QLabel(self)
         #self.label_video.setMinimumSize(640, 480)  # 设置最小大小
-        self.label_video.setMaximumSize(800, 600) 
+        #self.label_video.setMaximumSize(800, 600) 
         self.label_video.setAlignment(Qt.AlignCenter)
         # 创建标签，用于显示视频流
         #self.label = QLabel(self)
