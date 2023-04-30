@@ -75,6 +75,7 @@ class App(QWidget):
         self.width = 800
         self.height = 600
         self.model=model
+        self.filename=filename
         #self.video_capture = video_capture
         self.initUI()
 
@@ -111,12 +112,14 @@ class App(QWidget):
 
         # 将垂直布局应用于主窗口
         self.setLayout(vbox)
-
+        self.vbox=vbox
         # 打开视频流
         #self.cap = cv2.VideoCapture(0)
         self.capture = cv2.VideoCapture(0)  # 指定0号摄像头
-        if filename:
-            self.capture = cv2.VideoCapture(filename)
+        print(filename)
+        print(self.filename)
+        if self.filename:
+            self.capture = cv2.VideoCapture(self.filename)
         self.timer.start(30)
         #居中显示
         qtRectangle = self.frameGeometry()

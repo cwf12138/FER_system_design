@@ -20,13 +20,12 @@ class MainWindow(QWidget):
         self.button_upload = QPushButton('上传视频')
         self.label_path = QLabel("")
         self.button_video=QPushButton('人脸检测')
-
         # 设置布局
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.button_upload)
-        vbox.addWidget(self.button_video)
-        vbox.addWidget(self.label_path)
-        self.setLayout(vbox)
+        self.vbox = QVBoxLayout()
+        self.vbox.addWidget(self.button_upload)
+        self.vbox.addWidget(self.button_video)
+        self.vbox.addWidget(self.label_path)
+        self.setLayout(self.vbox)
 
         # 绑定事件
         self.button_upload.clicked.connect(self.get_video_path)
