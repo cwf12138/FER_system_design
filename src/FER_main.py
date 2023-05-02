@@ -1,8 +1,10 @@
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QTextEdit, QStackedWidget, QTabWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame
 from qt_material import apply_stylesheet
+from recognition_camera import Camera,load_model
 class UsageRecord(QWidget):
     def __init__(self):
         super().__init__()
@@ -61,24 +63,36 @@ class FaceRecognition(QWidget):
 
 
 class CameraRecognition(QWidget):
-    def __init__(self):
+    def __init__(self,model):
         super().__init__()
+        self.model=model
         self.initUI()
 
     def initUI(self):
         # 添加组件
         camera_label = QLabel('显示摄像头获取的图像区域')
+        camera_widget=Camera(self.model)
+        camera_box=camera_widget.vbox
         bar_label = QLabel('显示柱状图区域')
         desc_label = QLabel('显示说明区域')
-
+        separator_line_v = QFrame()
+        separator_line_v.setFrameShape(QFrame.VLine)
+        separator_line_v.setFrameShadow(QFrame.Sunken)
+        separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
+        separator_line_h.setFrameShape(QFrame.HLine)
+        separator_line_h.setFrameShadow(QFrame.Sunken)
+        #qbtn=QPushButton("push it")
         # 创建布局管理器
         hbox = QHBoxLayout()
         vbox_left = QVBoxLayout()
         vbox_left.addWidget(camera_label)
-        hbox.addLayout(vbox_left)
+        #vbox_left.addWidget(qbtn)
+        hbox.addLayout(camera_box)
+        hbox.addWidget(separator_line_v)
 
         vbox_right = QVBoxLayout()
         vbox_right.addWidget(bar_label)
+        vbox_right.addWidget(separator_line_h)
         vbox_right.addWidget(desc_label)
         hbox.addLayout(vbox_right)
 
@@ -96,42 +110,55 @@ class VideoRecognition(QWidget):
         video_label = QLabel('显示视频区域')
         bar_label = QLabel('显示柱状图区域')
         desc_label = QLabel('显示说明区域')
+        separator_line = QFrame()
+        separator_line.setFrameShape(QFrame.VLine)
+        separator_line.setFrameShadow(QFrame.Sunken)
+        separator_line_h = QFrame()
+        #separator_line_h.setLineWidth(3)
+        #separator_line_h.setMidLineWidth(3) 
+        separator_line_h.setFrameShape(QFrame.HLine)
+        separator_line_h.setFrameShadow(QFrame.Plain)
 
         # 创建布局管理器
         hbox = QHBoxLayout()
         vbox_left = QVBoxLayout()
         vbox_left.addWidget(video_label)
+        #vbox_left.addWidget(separator_line)
         hbox.addLayout(vbox_left)
+        hbox.addWidget(separator_line)
 
         vbox_right = QVBoxLayout()
-        vbox_right.addWidget(bar_label)
         vbox_right.addWidget(desc_label)
+        vbox_right.addWidget(separator_line_h)
+        vbox_right.addWidget(bar_label)
         hbox.addLayout(vbox_right)
 
         # 设置布局管理器
         self.setLayout(hbox)
 
-
-class MainWindow(QWidget):
-    def __init__(self):
+#Qwidget
+class MainWindow(QMainWindow):
+    def __init__(self,model):
         super().__init__()
+        self.model=model
         self.initUI()
 
     def initUI(self):
         # 添加组件
+        main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
         face_recognition_btn = QPushButton('基于图片的表情识识')
         camera_recognition_btn = QPushButton('基于摄像头的表情识别')
         video_recognition_btn = QPushButton('基于视频的表情识别')
         usage_record_btn = QPushButton('查看使用记录')
-            # 创建堆叠窗口和页面
+        # 创建堆叠窗口和页面
         stacked_widget = QStackedWidget()
-
+        #四个功能界面
         face_recognition_page = FaceRecognition()
-        camera_recognition_page = CameraRecognition()
+        camera_recognition_page = CameraRecognition(self.model)
         video_recognition_page = VideoRecognition()
         usage_record_page = UsageRecord()
-
+        #添加到堆叠窗口里
         stacked_widget.addWidget(face_recognition_page)
         stacked_widget.addWidget(camera_recognition_page)
         stacked_widget.addWidget(video_recognition_page)
@@ -139,7 +166,7 @@ class MainWindow(QWidget):
 
         # 创建标签页
         tab_widget = QTabWidget()
-        tab_widget.addTab(stacked_widget, '功能')
+        tab_widget.addTab(stacked_widget, '功能')  #当前页面
         tab_widget.addTab(QTextEdit(), '帮助')
 
 
@@ -160,15 +187,13 @@ class MainWindow(QWidget):
         #nav_layout.addWidget(tab_widget)
         main_layout = QVBoxLayout()
         main_layout.addWidget(title_label, alignment=Qt.AlignCenter)
-        #main_layout.addWidget(nav_layout)
         main_layout.addLayout(nav_layout)
         main_layout.addWidget(tab_widget)
-        #main_layout.addLayout(nav_layout)
-        #main_layout.addLayout(tab_widget)
 
 
         # 设置布局管理器
-        self.setLayout(main_layout)
+        main_widget.setLayout(main_layout)
+        self.setCentralWidget(main_widget)
 
         # 信号槽连接
         face_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(face_recognition_page))
@@ -178,6 +203,7 @@ class MainWindow(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
-    window = MainWindow()
+    model=load_model()
+    window = MainWindow(model)
     window.show()
     sys.exit(app.exec_())

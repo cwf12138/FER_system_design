@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog, QVBoxLayout
 import sys
-from recognition_camera import App
+from recognition_camera import Camera
 from model import CNN2, CNN3
 def load_model():
     """

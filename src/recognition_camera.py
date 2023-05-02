@@ -66,7 +66,7 @@ def generate_faces(face_img, img_size=48):
 
 
 #QMainWindow
-class App(QWidget):
+class Camera(QWidget):
     def __init__(self,model,filename=None, parent=None):
         super().__init__()
         self.title = 'Face Recognition'
@@ -161,8 +161,11 @@ class App(QWidget):
                     # puttext中文显示问题
                     # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
         qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-        self.emotion=emotions[0]
-        self.result_possibility=result_possibilities[0]
+        if len(emotions)!=0:  #修复了emotions列表可能为空并出现IndexError: list index out of range的bug
+            self.emotion=emotions[0]
+        if len(result_possibilities)!=0:
+            self.result_possibility=result_possibilities[0]
+        #print(self.emotion)
             # 将 QImage 对象转换为 QPixmap 对象
         #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
         pixmap = QPixmap.fromImage(qImg)    
@@ -260,6 +263,6 @@ if __name__ == '__main__':
     #predict_expression()
     app = QApplication(sys.argv)
     model = load_model()  #导入模型，提出来，不然循环每次都导入会报内存的
-    ex = App(model)
+    ex = Camera(model)
     ex.show()
     app.exec_()
