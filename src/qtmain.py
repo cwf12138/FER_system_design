@@ -3,6 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QStackedWidget
 from qtupload import MainWindow,load_model
 from recognition_camera import App
+from qt_material import apply_stylesheet
+from qt_material import list_themes
 class Window(QMainWindow):
     def __init__(self,model):
         super().__init__()
@@ -73,6 +75,9 @@ class Window(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    #apply_stylesheet(app, theme='dark_teal.xml')
+    apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
+    #print(list_themes())
     model=load_model()
     window = Window(model)
     window.show()

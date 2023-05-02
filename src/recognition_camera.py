@@ -76,6 +76,8 @@ class App(QWidget):
         self.height = 600
         self.model=model
         self.filename=filename
+        self.emotion=[]
+        self.result_possibility=[]
         #self.video_capture = video_capture
         self.initUI()
 
@@ -141,6 +143,8 @@ class App(QWidget):
             # cascade = cv2.CascadeClassifier('./dataset/params/haarcascade_frontalface_alt.xml')  # 检测人脸
             # # 利用分类器识别出哪个区域为人脸
             # faces = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(120, 120))
+        emotions = []
+        result_possibilities = []
         faces = blaze_detect(frame)
         if faces is not None and len(faces) > 0:
             for (x, y, w, h) in faces:
@@ -152,9 +156,13 @@ class App(QWidget):
                 emotion = index2emotion(label_index)  #*这里可以注意一下
                 cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
                 frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
+                emotions.append(emotion)
+                result_possibilities.append(result_sum)
                     # puttext中文显示问题
                     # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
         qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
+        self.emotion=emotions[0]
+        self.result_possibility=result_possibilities[0]
             # 将 QImage 对象转换为 QPixmap 对象
         #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
         pixmap = QPixmap.fromImage(qImg)    
