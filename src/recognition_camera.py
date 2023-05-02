@@ -32,6 +32,18 @@ if opt.source == 1 and opt.video_path is not None:
 else:
     filename = None
 
+emotions_trans = {
+        'anger': '发怒',
+        'disgust': '厌恶',
+        'fear': '恐惧',
+        'happy': '开心',
+        'sad': '伤心',
+        'surprised': '惊讶',
+        'neutral': '中性',
+        'contempt': '蔑视',
+        'no':'无',
+
+}
 
 def load_model():
     """
@@ -132,8 +144,9 @@ class Camera(QWidget):
 
         vbox_right = QVBoxLayout()
         vbox_right.addWidget(self.label_emotion)
-        vbox_right.addWidget(separator_line_h)
         vbox_right.addWidget(self.label_img)
+        vbox_right.addWidget(separator_line_h)
+        vbox_right.addWidget(bar_label)
         hbox.addLayout(vbox_right)
         self.setLayout(hbox)
 
@@ -200,14 +213,12 @@ class Camera(QWidget):
         # 显示表情名
         if len(emotion)==0:
             emotion='no'
-        print(emotion)
-        self.label_emotion.setText( emotion)
+        #print(emotion)
+        self.label_emotion.setText(emotions_trans[emotion])
         # 显示emoji
         if emotion != 'no':
-            str1='./assets/icons/' + str(emotion) + '.png'
-            print(str1)
             img = cv2.imread('./assets/icons/' + str(emotion) + '.png')    #这里是iemoji表情的路径
-            print()
+            #print()
             frame = cv2.cvtColor(cv2.resize(img, (100,100)), cv2.COLOR_BGR2RGB)  #修改大小
             self.label_img.setPixmap(QPixmap.fromImage(QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
                              QImage.Format_RGB888)))
@@ -228,6 +239,8 @@ class Camera(QWidget):
         self.timer.stop()
         self.btn_play_pause.setText("Play")
         self.label_video.clear()
+        self.label_emotion.setText("emotion")
+        self.label_img.setText("img")
 
     def closeEvent(self, event):
         # 触发信号
