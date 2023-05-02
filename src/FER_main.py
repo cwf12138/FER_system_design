@@ -61,18 +61,18 @@ class FaceRecognition(QWidget):
         # 设置布局管理器
         self.setLayout(vbox)
 
-
-class CameraRecognition(QWidget):
+#Qwidget
+class CameraRecognition(Camera):
     def __init__(self,model):
-        super().__init__()
+        super().__init__(self,model)
         self.model=model
         self.initUI()
 
     def initUI(self):
         # 添加组件
         camera_label = QLabel('显示摄像头获取的图像区域')
-        camera_widget=Camera(self.model)
-        camera_box=camera_widget.vbox
+        #camera_widget=Camera(self.model)
+        #camera_box=camera_widget.vbox
         bar_label = QLabel('显示柱状图区域')
         desc_label = QLabel('显示说明区域')
         separator_line_v = QFrame()
@@ -87,7 +87,7 @@ class CameraRecognition(QWidget):
         vbox_left = QVBoxLayout()
         vbox_left.addWidget(camera_label)
         #vbox_left.addWidget(qbtn)
-        hbox.addLayout(camera_box)
+        hbox.addLayout(vbox_left)
         hbox.addWidget(separator_line_v)
 
         vbox_right = QVBoxLayout()
@@ -97,7 +97,7 @@ class CameraRecognition(QWidget):
         hbox.addLayout(vbox_right)
 
         # 设置布局管理器
-        self.setLayout(hbox)
+        #self.setLayout(hbox)
 
 
 class VideoRecognition(QWidget):
@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
         stacked_widget = QStackedWidget()
         #四个功能界面
         face_recognition_page = FaceRecognition()
-        camera_recognition_page = CameraRecognition(self.model)
+        camera_recognition_page = Camera(self.model)
         video_recognition_page = VideoRecognition()
         usage_record_page = UsageRecord()
         #添加到堆叠窗口里

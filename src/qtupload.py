@@ -38,7 +38,7 @@ class MainWindow(QWidget):
             self.video_path = filename
             self.label_path.setText(f"已选择：{filename}")
     def use_recognition(self):
-        app=App(model,self.video_path)
+        app=Camera(model,self.video_path)
         app.show()
 
 

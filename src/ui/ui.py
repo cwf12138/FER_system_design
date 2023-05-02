@@ -115,6 +115,7 @@ class UI(object):
     def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         #print(emotion)
+        
         self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
         # 显示emoji
         if emotion != 'no':

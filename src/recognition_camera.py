@@ -7,6 +7,7 @@ import os
 import argparse
 import sys
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+sys.path.append('../')
 import cv2
 import numpy as np
 from model import CNN2, CNN3
@@ -15,9 +16,9 @@ from blazeface import blaze_detect
 
 
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget
-from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize
-
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget,QFrame
+from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize,QCoreApplication
+from qt_material import apply_stylesheet
 
 
 
@@ -78,6 +79,9 @@ class Camera(QWidget):
         self.filename=filename
         self.emotion=[]
         self.result_possibility=[]
+        self.label_img=QLabel('img')
+        self.label_emotion=QLabel('emotion')
+        self.setObjectName=("FER")
         #self.video_capture = video_capture
         self.initUI()
 
@@ -88,14 +92,20 @@ class Camera(QWidget):
         # 定义一个定时器
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.predict_expression_test)   
+        self.timer.timeout.connect(lambda:self.show_emotion(self.emotion))
+        #lambda:child_window.show()
+        self.show_emotion(self.emotion)
         # 创建一个标签用于显示视频流
         self.label_video = QLabel(self)
-        #self.label_video.setMinimumSize(640, 480)  # 设置最小大小
-        #self.label_video.setMaximumSize(800, 600) 
         self.label_video.setAlignment(Qt.AlignCenter)
-        # 创建标签，用于显示视频流
-        #self.label = QLabel(self)
-        #self.label.setGeometry(10, 10, 640, 480)
+        bar_label = QLabel('显示柱状图区域')
+        desc_label = QLabel('显示说明区域')
+        separator_line_v = QFrame()
+        separator_line_v.setFrameShape(QFrame.VLine)
+        separator_line_v.setFrameShadow(QFrame.Sunken)
+        separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
+        separator_line_h.setFrameShape(QFrame.HLine)
+        separator_line_h.setFrameShadow(QFrame.Sunken)
         # 创建一个按钮用于开始/暂停视频流的播放
         self.btn_play_pause = QPushButton("Play", self)
         self.btn_play_pause.clicked.connect(self.play_pause_video)
@@ -113,16 +123,31 @@ class Camera(QWidget):
         vbox.addLayout(hbox)
 
         # 将垂直布局应用于主窗口
-        self.setLayout(vbox)
-        self.vbox=vbox
+        #self.vbox=vbox
+        #self.setLayout(vbox)  #这里很关键\
+        hbox = QHBoxLayout()
+        #vbox_left.addWidget(qbtn)
+        hbox.addLayout(vbox)
+        hbox.addWidget(separator_line_v)
+
+        vbox_right = QVBoxLayout()
+        vbox_right.addWidget(self.label_emotion)
+        vbox_right.addWidget(separator_line_h)
+        vbox_right.addWidget(self.label_img)
+        hbox.addLayout(vbox_right)
+        self.setLayout(hbox)
+
+
+
         # 打开视频流
         #self.cap = cv2.VideoCapture(0)
         self.capture = cv2.VideoCapture(0)  # 指定0号摄像头
-        print(filename)
-        print(self.filename)
+        #print(filename)
+        #print(self.filename)
         if self.filename:
             self.capture = cv2.VideoCapture(self.filename)
         self.timer.start(30)
+        
         #居中显示
         qtRectangle = self.frameGeometry()
         centerPoint = QDesktopWidget().availableGeometry().center()
@@ -153,7 +178,7 @@ class Camera(QWidget):
                 results = self.model.predict(faces)
                 result_sum = np.sum(results, axis=0).reshape(-1) #这里也可以加一个概率统计 ，frame 和 possibilities
                 label_index = np.argmax(result_sum, axis=0)
-                emotion = index2emotion(label_index)  #*这里可以注意一下
+                emotion = index2emotion(label_index,'en')  #*这里可以注意一下
                 cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
                 frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
                 emotions.append(emotion)
@@ -170,7 +195,25 @@ class Camera(QWidget):
         #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
         pixmap = QPixmap.fromImage(qImg)    
             # 在标签上显示图像
-        self.label_video.setPixmap(pixmap)   
+        self.label_video.setPixmap(pixmap)  
+    def show_emotion(self, emotion):  #展示结果   也是可以借鉴的hh
+        # 显示表情名
+        if len(emotion)==0:
+            emotion='no'
+        print(emotion)
+        self.label_emotion.setText( emotion)
+        # 显示emoji
+        if emotion != 'no':
+            str1='./assets/icons/' + str(emotion) + '.png'
+            print(str1)
+            img = cv2.imread('./assets/icons/' + str(emotion) + '.png')    #这里是iemoji表情的路径
+            print()
+            frame = cv2.cvtColor(cv2.resize(img, (100,100)), cv2.COLOR_BGR2RGB)  #修改大小
+            self.label_img.setPixmap(QPixmap.fromImage(QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
+                             QImage.Format_RGB888)))
+        else:
+            self.label_img.setText("no result")  #翻译
+        # 显示直方图
     def play_pause_video(self):
         """开始/暂停视频流的播放"""
         if not self.timer.isActive():
@@ -210,7 +253,7 @@ def predict_expression():
     font_color = (255, 255, 255)  # 白字字
     capture = cv2.VideoCapture(0)  # 指定0号摄像头
     app = QApplication(sys.argv)
-    ex = App(capture)
+    ex = Camera(capture)
     if filename:
         capture = cv2.VideoCapture(filename)
 
@@ -262,6 +305,7 @@ def predict_expression():
 if __name__ == '__main__':
     #predict_expression()
     app = QApplication(sys.argv)
+    apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
     model = load_model()  #导入模型，提出来，不然循环每次都导入会报内存的
     ex = Camera(model)
     ex.show()
