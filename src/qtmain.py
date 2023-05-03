@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QStackedWidget
-from qtupload import MainWindow,load_model
+from qtupload import Videoupload,load_model
 from recognition_camera import Camera
 from qt_material import apply_stylesheet
 from qt_material import list_themes
@@ -14,7 +14,7 @@ class Window(QMainWindow):
         self.setCentralWidget(self.stacked_widget)
         self.model=model
         # 创建页面1
-        self.page1=MainWindow(self.model)  #print(self.page1) #print(type(self.page1)) #layout1 = QVBoxLayout(self.page1)
+        self.page1=Videoupload(self.model)  #print(self.page1) #print(type(self.page1)) #layout1 = QVBoxLayout(self.page1)
         button1 = QPushButton("切换到页面2")
         button1.clicked.connect(self.show_page2)  #layout1.addWidget(button1) #layout1=self.page1.layout
         layout1=self.page1.vbox

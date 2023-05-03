@@ -139,10 +139,10 @@ class Camera(QWidget):
         # 将垂直布局应用于主窗口
         #self.vbox=vbox
         #self.setLayout(vbox)  #这里很关键\
-        hbox = QHBoxLayout()
+        self.hbox = QHBoxLayout()
         #vbox_left.addWidget(qbtn)
-        hbox.addLayout(vbox)
-        hbox.addWidget(separator_line_v)
+        self.hbox.addLayout(vbox)
+        self.hbox.addWidget(separator_line_v)
 
         vbox_right = QVBoxLayout()
         vbox_right.addWidget(self.label_emotion)
@@ -156,11 +156,10 @@ class Camera(QWidget):
         #self.vbox_right.addWidget(self.barchart)
         #self.label_chart.setLayout(self.vbox_right)
         vbox_right.addStretch()
-        hbox.addLayout(vbox_right)
+        self.hbox.addLayout(vbox_right)
         #hbox.addWidget(self.label_chart)
-        self.setLayout(hbox)
+        self.setLayout(self.hbox)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
 
 
         # 打开视频流

@@ -10,7 +10,7 @@ def load_model():
     model = CNN3()
     model.load_weights('./models/cnn3_best_weights.h5')
     return model
-class MainWindow(QWidget):
+class Videoupload(QWidget):
     def __init__(self,model):
         super().__init__()
 
@@ -29,7 +29,6 @@ class MainWindow(QWidget):
 
         # 绑定事件
         self.button_upload.clicked.connect(self.get_video_path)
-        self.button_video.clicked.connect(self.use_recognition)
 
 
     def get_video_path(self):
@@ -37,9 +36,6 @@ class MainWindow(QWidget):
         if filename:
             self.video_path = filename
             self.label_path.setText(f"已选择：{filename}")
-    def use_recognition(self):
-        app=Camera(model,self.video_path)
-        app.show()
 
 
 if __name__ == '__main__':
