@@ -102,8 +102,9 @@ class CameraRecognition(Camera):
 
 
 class VideoRecognition(QWidget):
-    def __init__(self):
+    def __init__(self,model):
         super().__init__()
+        self.model=model
         self.initUI()
 
     def initUI(self):
@@ -133,6 +134,8 @@ class VideoRecognition(QWidget):
         vbox_right.addWidget(separator_line_h)
         vbox_right.addWidget(bar_label)
         hbox.addLayout(vbox_right)
+        cam=Camera(self.model)
+        hbox.addWidget(cam)
 
         # 设置布局管理器
         self.setLayout(hbox)
@@ -154,33 +157,26 @@ class MainWindow(QMainWindow):
         video_recognition_btn = QPushButton('基于视频的表情识别')
         usage_record_btn = QPushButton('查看使用记录')
         # 创建堆叠窗口和页面
-        stacked_widget = QStackedWidget()
+        self.stacked_widget = QStackedWidget()
         #四个功能界面
-        face_recognition_page = Picture(self.model)
-        camera_recognition_page = Camera(self.model)
-        video_recognition_page = VideoRecognition()
-        usage_record_page = UsageRecord()
+        self.face_recognition_page = Picture(self.model)
+        #self.camera_recognition_page = CameraRecognition(self.model)
+        #camera_recognition_page = Camera(self.model)
+        #self.video_recognition_page = VideoRecognition(self.model)
+        #self.usage_record_page = UsageRecord()
         #添加到堆叠窗口里
-        stacked_widget.addWidget(face_recognition_page)
-        stacked_widget.addWidget(camera_recognition_page)
-        stacked_widget.addWidget(video_recognition_page)
-        stacked_widget.addWidget(usage_record_page)
+        self.stacked_widget.addWidget(self.face_recognition_page)
+        #stacked_widget.addWidget(camera_recognition_page)
+        #stacked_widget.addWidget(video_recognition_page)
+        #stacked_widget.addWidget(usage_record_page)
 
         # 创建标签页
         tab_widget = QTabWidget()
-        tab_widget.addTab(stacked_widget, '功能')  #当前页面
+        tab_widget.addTab(self.stacked_widget, '功能')  #当前页面
         tab_widget.addTab(QTextEdit(), '帮助')
-
-
+        
         # 创建布局管理器
 
-        '''vbox = QVBoxLayout()
-        vbox.addWidget(title_label, alignment=Qt.AlignCenter)
-        vbox.addWidget(face_recognition_btn)
-        vbox.addWidget(camera_recognition_btn)
-        vbox.addWidget(video_recognition_btn)
-        vbox.addWidget(usage_record_btn)
-        vbox.addWidget(tab_widget)'''
         nav_layout = QHBoxLayout()
         nav_layout.addWidget(face_recognition_btn)
         nav_layout.addWidget(camera_recognition_btn)
@@ -196,12 +192,66 @@ class MainWindow(QMainWindow):
         # 设置布局管理器
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
-
+        face_recognition_btn.clicked.connect(self.add_and_show_picture)
+        camera_recognition_btn.clicked.connect(self.add_and_show_camera)
+        video_recognition_btn.clicked.connect(self.add_and_show_video)
+        usage_record_btn.clicked.connect(self.add_and_show_record)
         # 信号槽连接
-        face_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(face_recognition_page))
-        camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
-        video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
-        usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
+        #face_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(face_recognition_page))
+        #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
+        #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
+        #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
+    #摄像头
+    def add_and_show_camera(self):
+        current_widget_index = self.stacked_widget.currentIndex()
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        self.stacked_widget.removeWidget(widget_to_remove)  
+        widget_to_remove.deleteLater()
+        self.camera_recognition_page = Camera(self.model)
+        if(self.stacked_widget.indexOf(self.camera_recognition_page)==-1):   
+            self.stacked_widget.addWidget(self.camera_recognition_page)
+        self.stacked_widget.setCurrentWidget(self.camera_recognition_page)
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(current_widget_index)
+    #图片
+    def add_and_show_picture(self):
+        current_widget_index = self.stacked_widget.currentIndex()
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        self.stacked_widget.removeWidget(widget_to_remove)  
+        widget_to_remove.deleteLater()
+        self.face_recognition_page = Picture(self.model)
+        if(self.stacked_widget.indexOf(self.face_recognition_page)==-1):   
+            self.stacked_widget.addWidget(self.face_recognition_page)
+        self.stacked_widget.setCurrentWidget(self.face_recognition_page)
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(current_widget_index)
+    #视频
+    def add_and_show_video(self):
+        current_widget_index = self.stacked_widget.currentIndex()
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        self.stacked_widget.removeWidget(widget_to_remove)  
+        widget_to_remove.deleteLater()
+        self.video_recognition_page = VideoRecognition(self.model)
+        if(self.stacked_widget.indexOf(self.video_recognition_page)==-1):   
+            self.stacked_widget.addWidget(self.video_recognition_page)
+        self.stacked_widget.setCurrentWidget(self.video_recognition_page)
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(current_widget_index)
+    def add_and_show_record(self):
+        current_widget_index = self.stacked_widget.currentIndex()
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        self.stacked_widget.removeWidget(widget_to_remove)  
+        widget_to_remove.deleteLater()
+        self.usage_record_page = UsageRecord()
+        if(self.stacked_widget.indexOf(self.usage_record_page)==-1):   
+            self.stacked_widget.addWidget(self.usage_record_page)
+        self.stacked_widget.setCurrentWidget(self.usage_record_page)
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(current_widget_index)
+    
+
+
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
