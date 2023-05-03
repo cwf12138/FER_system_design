@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QFr
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PyQt5.QtCore import Qt, QMargins,QRectF
 from PyQt5.QtGui import QPainter
+import random
 class BarChart(QWidget):
     def __init__(self, x, y):
         super().__init__()
-        self.fff=y[0]
-
+        #self.fff=y[0]
         # 创建条形集合并添加数据
         set0 = QBarSet("Quantity")
         for value in y:
@@ -52,6 +52,11 @@ class BarChart(QWidget):
 
         # 将QFrame设置为主窗口的中央部件
         self.setLayout(self.layout)
+    def update(self):
+        # 随机生成柱状数据
+        data = [random.randint(0, 10) for i in range(8)]
+        for i in range(len(data)):
+            self.bar_set.replace(i, data[i])    
 
 if __name__ == "__main__":
     x = ['anger', 'disgust', 'fear', 'happy', 'sad', 'surprised', 'neutral', 'contempt']

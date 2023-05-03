@@ -93,6 +93,7 @@ class Camera(QWidget):
         self.result_possibility=[1,2,4,6,1,4,2,2]
         self.label_img=QLabel('img')
         self.label_emotion=QLabel('emotion')
+        self.label_chart=QLabel('chart')
         self.setObjectName=("FER")
         #self.video_capture = video_capture
         self.initUI()
@@ -144,21 +145,19 @@ class Camera(QWidget):
         hbox.addWidget(separator_line_v)
 
         vbox_right = QVBoxLayout()
-        #vbox_right.addWidget(self.label_emotion)
-        #vbox_right.addWidget(self.label_img)
-        #vbox_right.addWidget(separator_line_h)
+        vbox_right.addWidget(self.label_emotion)
+        vbox_right.addWidget(self.label_img)
+        vbox_right.addWidget(separator_line_h)
         #self.stackedLayout = QStackedLayout()
         #print(self.result_possibility)
-        #barchart=QWidget()
-        barchart=BarChart(xemotions,list(self.result_possibility))
-        #self.stackedLayout.addWidget(barchart)
-        #vbox_right.addLayout(barchart.layout)
-        self.barchart=barchart
-        vbox_right.addWidget(self.barchart)
+        #生成柱状图表
+        #barchart=BarChart(xemotions,list(self.result_possibility))
+        #self.barchart=barchart
+        #self.vbox_right.addWidget(self.barchart)
+        #self.label_chart.setLayout(self.vbox_right)
         vbox_right.addStretch()
-
-        #hbox.addLayout(vbox_right)
-        hbox.addWidget(self.barchart)
+        hbox.addLayout(vbox_right)
+        #hbox.addWidget(self.label_chart)
         self.setLayout(hbox)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -222,11 +221,9 @@ class Camera(QWidget):
         pixmap = QPixmap.fromImage(qImg)    
             # 在标签上显示图像
         self.label_video.setPixmap(pixmap)
-        self.barchart=BarChart(xemotions,list(self.result_possibility))
-        test_box=QVBoxLayout()
-        test_box.addWidget(self.barchart)
-        #print(self.barchart.fff)
-        #print(self.result_possibility)  
+        #self.vbox_right.removeWidget(self.barchart)
+        #self.barchart=BarChart(xemotions,list(self.result_possibility))
+        #self.vbox_right.addWidget(self.barchart)
     def show_emotion(self, emotion):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         if len(emotion)==0:
