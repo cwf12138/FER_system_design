@@ -16,10 +16,10 @@ from blazeface import blaze_detect
 
 
 from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget,QFrame
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget,QFrame,QSizePolicy,QStackedLayout
 from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize,QCoreApplication
 from qt_material import apply_stylesheet
-
+from qtchart_widget import BarChart
 
 
 parser = argparse.ArgumentParser()
@@ -44,7 +44,7 @@ emotions_trans = {
         'no':'无',
 
 }
-
+xemotions = ['anger', 'disgust', 'fear', 'happy', 'sad', 'surprised', 'neutral', 'contempt']
 def load_model():
     """
     加载本地模型
@@ -90,7 +90,7 @@ class Camera(QWidget):
         self.model=model
         self.filename=filename
         self.emotion=[]
-        self.result_possibility=[]
+        self.result_possibility=[1,2,4,6,1,4,2,2]
         self.label_img=QLabel('img')
         self.label_emotion=QLabel('emotion')
         self.setObjectName=("FER")
@@ -133,6 +133,7 @@ class Camera(QWidget):
         vbox = QVBoxLayout()
         vbox.addWidget(self.label_video)
         vbox.addLayout(hbox)
+        vbox.addStretch()
 
         # 将垂直布局应用于主窗口
         #self.vbox=vbox
@@ -143,12 +144,23 @@ class Camera(QWidget):
         hbox.addWidget(separator_line_v)
 
         vbox_right = QVBoxLayout()
-        vbox_right.addWidget(self.label_emotion)
-        vbox_right.addWidget(self.label_img)
-        vbox_right.addWidget(separator_line_h)
-        vbox_right.addWidget(bar_label)
-        hbox.addLayout(vbox_right)
+        #vbox_right.addWidget(self.label_emotion)
+        #vbox_right.addWidget(self.label_img)
+        #vbox_right.addWidget(separator_line_h)
+        #self.stackedLayout = QStackedLayout()
+        #print(self.result_possibility)
+        #barchart=QWidget()
+        barchart=BarChart(xemotions,list(self.result_possibility))
+        #self.stackedLayout.addWidget(barchart)
+        #vbox_right.addLayout(barchart.layout)
+        self.barchart=barchart
+        vbox_right.addWidget(self.barchart)
+        vbox_right.addStretch()
+
+        #hbox.addLayout(vbox_right)
+        hbox.addWidget(self.barchart)
         self.setLayout(hbox)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
 
 
@@ -203,12 +215,18 @@ class Camera(QWidget):
             self.emotion=emotions[0]
         if len(result_possibilities)!=0:
             self.result_possibility=result_possibilities[0]
+        
         #print(self.emotion)
             # 将 QImage 对象转换为 QPixmap 对象
         #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
         pixmap = QPixmap.fromImage(qImg)    
             # 在标签上显示图像
-        self.label_video.setPixmap(pixmap)  
+        self.label_video.setPixmap(pixmap)
+        self.barchart=BarChart(xemotions,list(self.result_possibility))
+        test_box=QVBoxLayout()
+        test_box.addWidget(self.barchart)
+        #print(self.barchart.fff)
+        #print(self.result_possibility)  
     def show_emotion(self, emotion):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         if len(emotion)==0:
@@ -224,6 +242,8 @@ class Camera(QWidget):
                              QImage.Format_RGB888)))
         else:
             self.label_img.setText("no result")  #翻译
+        #self.barchart=BarChart(x,list(self.result_possibility))
+        #print(self.result_possibility)
         # 显示直方图
     def play_pause_video(self):
         """开始/暂停视频流的播放"""
