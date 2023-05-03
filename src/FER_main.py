@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLa
 from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame
 from qt_material import apply_stylesheet
 from recognition_camera import Camera,load_model
+from recognition_picture import Picture
 class UsageRecord(QWidget):
     def __init__(self):
         super().__init__()
@@ -145,6 +146,7 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         # 添加组件
+        self.resize(1000,800)
         main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
         face_recognition_btn = QPushButton('基于图片的表情识识')
@@ -154,7 +156,7 @@ class MainWindow(QMainWindow):
         # 创建堆叠窗口和页面
         stacked_widget = QStackedWidget()
         #四个功能界面
-        face_recognition_page = FaceRecognition()
+        face_recognition_page = Picture(self.model)
         camera_recognition_page = Camera(self.model)
         video_recognition_page = VideoRecognition()
         usage_record_page = UsageRecord()
