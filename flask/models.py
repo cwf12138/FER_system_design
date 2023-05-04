@@ -30,7 +30,7 @@ class Picture_FER_Usage_Record(db.Model):
     uid = db.Column(db.Integer, db.ForeignKey('user.uid',ondelete='CASCADE'))
     result = db.Column(db.String(50))
     picturetime =  db.Column(db.DateTime, default=datetime.now)
-    picture_address = db.Column(db.String(50))
+    picture_address = db.Column(db.String(500))
 
 
 class Video_FER_Usage_Record(db.Model):
