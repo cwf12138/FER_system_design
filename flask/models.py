@@ -6,10 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 class User(db.Model):
     __tablename__="user"
     uid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50),default='default_name')
     number = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(500))
-    avater = db.Column(db.String(500))
+    avatar = db.Column(db.String(500))
     permission = db.Column(db.String(50))
     picture_records = db.relationship('Picture_FER_Usage_Record', backref='Puser', cascade='all, delete-orphan', passive_deletes = True)
     video_records = db.relationship('Video_FER_Usage_Record', backref='Vuser', cascade='all, delete-orphan', passive_deletes = True)

@@ -10,6 +10,7 @@ from functools import wraps
 from external import db
 from models import Admin,User,Picture_FER_Usage_Record,Video_FER_Usage_Record,Camera_FER_Usage_Record
 import datetime
+import jwt
 app = Flask(__name__)
 app.config.from_object(external)
 api = Api(app, default_mediatype="application/json")
@@ -23,23 +24,75 @@ headers = {
 }
 SALT = 'iv%i6xo7l8_t9bf_u!8#g#m*)*+ej@bek6)(@u3kh*42+unjv='
 
-@app.route('/')
-def index():
- return "Hello!"
-
-
 class Login(Resource):
-    def get(self):
-        return 
+    def post(self):
+        number=request.json['number']
+        password=request.json['password']
+        if not number or not password:
+            return {'msg':'number or password is missing'}
+        user=User.query.filter(User.number==number).first()
+        if check_password_hash(user.password, password):
+            token = jwt.encode({'number' : number, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},key=SALT, algorithm="HS256", headers=headers)
+            return jsonify({'token' : token.encode('UTF-8').decode('UTF-8')})
+
 class Register(Resource):
-    def get(self):
-        return 
+    def post(self):
+        number=request.json['number']
+        password=request.json['number']
+        hash_password=generate_password_hash(password, method='sha256')
+        user=User.query.filter(User.number==number).first()
+        if not user :
+            try:
+                new_user=User(number=number,password=hash_password,permisson='0')
+                db.session.add(new_user)
+                db.session.commit()
+            except:
+                db.session.rollback()
+            return {'msg':'Successfully added a new user'}
+        else :
+            return {'msg':'This phone number has already been registered, please try again with another phone number'}
+        return {"meg":"register is false"}
 class Modify_password(Resource):
-    def get(self):
-        return 
+    def post(self):
+        number=request.json["number"]
+        oldpassword=request.json["oldpassword"]
+        newpassword=request.json["newpassword"]
+        user=User.query.filter(User.number==number).first()
+        if check_password_hash(user.password, oldpassword):
+            try:
+                hash_password=generate_password_hash(newpassword, method='sha256')
+                user.password=hash_password
+                db.session.commit()
+            except:
+                db.session.rollback()
+            return {"msg":"password has been updated"}
+        else:
+            return {"msg":"Incorrect initial password"}
+
+class Modify_name(Resource):
+    def post(self):
+        number=request.json['number']
+        name=request.json['name']
+        user=User.query.filter(User.number==number).first()
+        try:
+            user.name=name
+            db.session.commit()
+        except:
+            db.session.rollback()
+        return {'msg':'Successfully modified username'}
+
 class Modify_avatar(Resource):
-    def get(self):
-        return 
+    def post(self):
+        avatar=request.json['avatar']
+        number=request.json['number']
+        user=User.query.filter(User.number==number).first()
+        try:
+            user.avatar=avatar
+            db.session.commit()
+        except:
+            db.session.rollback()
+        return {'msg':"Successfully modified the profile picture"}
+        
 
 class Picture_usage_record_get(Resource):
     def get(self,number):
@@ -114,6 +167,29 @@ class Camera_usage_record_add(Resource):
         except:
             db.session.rollback()
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        auth = request.headers.get('Authorization')
+        if not auth:
+            return jsonify({"msg":"token is missing"})
+        if auth and auth.startswith('Bearer '):
+            token=auth[7:]
+            print(token)
+            try:
+                data = jwt.decode(token,SALT, algorithms=['HS256'])
+                print(data)
+                current_patient = Patient.query.filter(Patient.account==data['account']).first()
+                print(current_patient)
+            except:
+                return jsonify({'message' : 'Token is invalid!'}), 401
+        return f(current_patient, *args, **kwargs)
+
+    return decorated
+
+
+
 
 api.add_resource(Picture_usage_record_get,'/get_picture_record/<string:number>')
 api.add_resource(Video_usage_record_get,'/get_video_record/<string:number>')
@@ -121,6 +197,10 @@ api.add_resource(Camera_usage_record_get,'/get_camera_record/<string:number>')
 api.add_resource(Picture_usage_record_add,'/add_picture_record/')
 api.add_resource(Video_usage_record_add,'/add_video_record/')
 api.add_resource(Camera_usage_record_add,'/add_camera_record/')
-
+api.add_resource(Modify_avatar,'/modify_avatar/')
+api.add_resource(Login,'/login/')
+api.add_resource(Modify_name/'modify_name/')
+api.add_resource(Register,'/register/')
+api.add_resource(Modify_password/'modifypassword/')
 if __name__ == '__main__':        #运行flask
     app.run(host="localhost",port=5000,debug=True)
