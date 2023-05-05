@@ -214,7 +214,6 @@ class Camera(QWidget):
         if len(result_possibilities)!=0:
             self.result_possibility=result_possibilities[0]
         
-        #print(self.emotion)
             # 将 QImage 对象转换为 QPixmap 对象
         #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
         pixmap = QPixmap.fromImage(qImg)    

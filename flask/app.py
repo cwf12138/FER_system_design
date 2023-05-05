@@ -131,7 +131,9 @@ class Camera_usage_record_get(Resource):
             usagetime=record.usagetime
             datas.append({'cid':cid,'usagetime':usagetime,'cameratime':cameratime})
         return {'datas':datas,'lens':len(datas)}
-class Picture_usage_record_add(Resource):
+    
+    #添加图片表情识别操作记录  ok
+class Picture_usage_record_add(Resource): 
     def post(self):
         number=request.json['number']
         uid=User.query.filter(User.number==number).first().uid
@@ -139,14 +141,15 @@ class Picture_usage_record_add(Resource):
         picture_address=request.json['picture_address']
         new_usage_record=Picture_FER_Usage_Record(uid=uid,result=result,picture_address=picture_address)
         try:
-            print("yes")
-            print(new_usage_record)
+            # print("yes")
+            #print(new_usage_record)
             db.session.add(new_usage_record)
             db.session.commit()
         except:
             print("no")
             db.session.rollback()
         return {'msg':"Added successfully"}
+    #基于上传视频的人脸表情识别 记录添加 ok
 class Video_usage_record_add(Resource):
     def post(self):
         number=request.json['number']
@@ -159,17 +162,21 @@ class Video_usage_record_add(Resource):
         except:
             db.session.rollback()
         return {'msg':"Added successfully"}
+    #基于摄像头的表情识别，记录添加  
 class Camera_usage_record_add(Resource):
     def post(self):
         number=request.json['number']
         uid=User.query.filter(User.number==number).first().uid
         usagetime=request.json['usagetime']
-        new_usage_record=Video_FER_Usage_Record(uid=uid,usagetime=usagetime)
+        new_usage_record=Camera_FER_Usage_Record(uid=uid,usagetime=usagetime)
         try:
             db.session.add(new_usage_record)
+            print("yes")
             db.session.commit()
         except:
+            print('No')
             db.session.rollback()
+        return {'msg':"Added successfully"}
 
 def token_required(f):
     @wraps(f)

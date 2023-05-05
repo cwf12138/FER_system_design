@@ -1,5 +1,5 @@
-import sys,cv2
-from PyQt5.QtCore import Qt
+import sys,cv2,time,requests
+from PyQt5.QtCore import Qt ,pyqtSlot,pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame
@@ -163,13 +163,20 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget()
         #四个功能界面
         self.face_recognition_page = Picture(self.model,self.number)
-        #self.camera_recognition_page = CameraRecognition(self.model)
+        #self.camera_recognition_page = Camera(self.model)
+        self.camera_recognition_page=QWidget()
+        self.camera_recognition_page.setVisible(False)
+        self.video_recognition_page_load = Videoupload(self.model)
         #camera_recognition_page = Camera(self.model)
         #self.video_recognition_page = VideoRecognition(self.model)
-        #self.usage_record_page = UsageRecord()
+        self.video_recognition_page=QWidget()
+        self.usage_record_page = UsageRecord()
         #添加到堆叠窗口里
         self.stacked_widget.addWidget(self.face_recognition_page)
-        #stacked_widget.addWidget(camera_recognition_page)
+        self.stacked_widget.addWidget(self.usage_record_page)
+        #self.stacked_widget.addWidget(self.camera_recognition_page)
+        self.stacked_widget.addWidget(self.video_recognition_page_load)
+        #self.camera_recognition_page.setVisible(False)
         #stacked_widget.addWidget(video_recognition_page)
         #stacked_widget.addWidget(usage_record_page)
 
@@ -199,82 +206,135 @@ class MainWindow(QMainWindow):
         camera_recognition_btn.clicked.connect(self.add_and_show_camera)
         video_recognition_btn.clicked.connect(self.add_and_show_video_uplaoad)
         usage_record_btn.clicked.connect(self.add_and_show_record)
+
+        self.stacked_widget.currentChanged.connect(self.switch_page)  #检测页面切换
+        self.stacked_widget.blockSignals(True) 
+        qbtn=QPushButton('进行人脸表情识别')
+        #self.video_recognition_page_load = Videoupload(self.model)
+        self.video_recognition_page_load.vbox.addWidget(qbtn)
+        qbtn.clicked.connect(self.add_and_show_video_run)
+        qbtn.clicked.connect(self.switch_video_run)
         # 信号槽连接
         #face_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(face_recognition_page))
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
-    #摄像头
+    def switch_page(self,page_name):    #每当页面切换时，添加相机表情识别记录
+        self.stacked_widget.blockSignals(True) 
+        #current=self.stacked_widget.currentIndex()
+        #print(str(current)+'fff')
+        self.end_time=time.time()
+        
+        runtime=self.end_time-self.start_time
+        print(self.end_time)
+        runtime=int(runtime)
+        print(runtime)
+        url='http://127.0.0.1:5000/add_camera_record/'
+        data={'number':self.number,'usagetime':runtime}
+        response = requests.post(url, json=data)
+        
+    #摄像头  
     def add_and_show_camera(self):
         current_widget_index = self.stacked_widget.currentIndex()
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)  
-        widget_to_remove.deleteLater()
-        self.camera_recognition_page = Camera(self.model)
-        
-        if(self.stacked_widget.indexOf(self.camera_recognition_page)==-1):   
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
+        #self.camera_recognition_page = Camera(self.model)
+        #self.capture=self.camera_recognition_page.capture
+        self.start_time=time.time()
+        print(self.start_time)
+        if(self.stacked_widget.indexOf(self.camera_recognition_page)==-1): 
+            self.camera_recognition_page=Camera(self.model)
             self.stacked_widget.addWidget(self.camera_recognition_page)
+        self.camera_recognition_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.camera_recognition_page)
+        self.stacked_widget.blockSignals(False)  #信号锁
         current_widget_index = self.stacked_widget.currentIndex()
-        #print(current_widget_index)
+        
     #图片
     def add_and_show_picture(self):
         current_widget_index = self.stacked_widget.currentIndex()
+        #print(str(current_widget_index)+'ggg')  
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)  
-        widget_to_remove.deleteLater()
-        self.face_recognition_page = Picture(self.model,self.number)
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.currentWidget().setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
+        #self.face_recognition_page = Picture(self.model,self.number)
         if(self.stacked_widget.indexOf(self.face_recognition_page)==-1):   
             self.stacked_widget.addWidget(self.face_recognition_page)
+        self.face_recognition_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.face_recognition_page)
+        #print(str(current_widget_index)+'aaaa')
         current_widget_index = self.stacked_widget.currentIndex()
-        #print(current_widget_index)
+        
     #视频上传
 
     def add_and_show_video_uplaoad(self):
         current_widget_index = self.stacked_widget.currentIndex()
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)  
-        widget_to_remove.deleteLater()
-        qbtn=QPushButton('进行人脸表情识别')
-        self.video_recognition_page_load = Videoupload(self.model)
-        self.video_recognition_page_load.vbox.addWidget(qbtn)
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
         self.filename=self.video_recognition_page_load.video_path
-        qbtn.clicked.connect(self.add_and_show_video_run)
         if(self.stacked_widget.indexOf(self.video_recognition_page_load)==-1):   
             self.stacked_widget.addWidget(self.video_recognition_page_load)
+        self.video_recognition_page_load.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.video_recognition_page_load)
         current_widget_index = self.stacked_widget.currentIndex()
-        #print(current_widget_index)
+        
     #视频表情识别
     def add_and_show_video_run(self):
+        
         current_widget_index = self.stacked_widget.currentIndex()
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)  
-        widget_to_remove.deleteLater()
-        qbtn=QPushButton('返回重新上传')
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
         self.filename=self.video_recognition_page_load.video_path
-        self.video_recognition_page = Camera(self.model,self.filename)
-        self.video_recognition_page.hbox.addWidget(qbtn)
-        qbtn.clicked.connect(self.add_and_show_video_uplaoad)
-        if(self.stacked_widget.indexOf(self.video_recognition_page)==-1):   
+        if(self.stacked_widget.indexOf(self.video_recognition_page)==-1):
+            self.video_recognition_page = Camera(self.model,self.filename)
+            qbtn=QPushButton('返回重新上传')
+            self.video_recognition_page.hbox.addWidget(qbtn)
+            qbtn.clicked.connect(self.add_and_show_video_uplaoad)
+            qbtn.clicked.connect(self.switch_video_upload)   
             self.stacked_widget.addWidget(self.video_recognition_page)
+        self.video_recognition_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.video_recognition_page)
         current_widget_index = self.stacked_widget.currentIndex()
+
+    @pyqtSlot()
+    def switch_video_run(self):
+        self.start_time=time.time()
+        #print('switch_video_run')
+    @pyqtSlot()
+    def switch_video_upload(self):
+        self.end_time=time.time()
+        runtime=self.end_time-self.start_time
+        #print(runtime)
+        runtime=int(runtime)
+        url='http://127.0.0.1:5000/add_video_record/'
+        data={'number':self.number,'usagetime':runtime}
+        response = requests.post(url, json=data)
+        #print("switch_video_upload")
+
+
     def add_and_show_record(self):
         current_widget_index = self.stacked_widget.currentIndex()
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
-        self.stacked_widget.removeWidget(widget_to_remove)  
-        widget_to_remove.deleteLater()
-        self.usage_record_page = UsageRecord()
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
+        #self.usage_record_page = UsageRecord()
         #qbtn=QPushButton('tbn')
         #self.usage_record_page.vbox.addWidget(qbtn)
         if(self.stacked_widget.indexOf(self.usage_record_page)==-1):   
             self.stacked_widget.addWidget(self.usage_record_page)
+        self.usage_record_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.usage_record_page)
         current_widget_index = self.stacked_widget.currentIndex()
         #print(current_widget_index)
-    
 
 
     
