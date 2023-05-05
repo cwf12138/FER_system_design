@@ -9,7 +9,7 @@ from flask_cors import CORS
 from functools import wraps
 from external import db
 from models import Admin,User,Picture_FER_Usage_Record,Video_FER_Usage_Record,Camera_FER_Usage_Record
-import datetime
+from datetime import date,datetime
 import jwt
 app = Flask(__name__)
 app.config.from_object(external)
@@ -110,12 +110,13 @@ class Picture_usage_record_get(Resource):
 
 class Video_usage_record_get(Resource):
     def get(self,number):
+        print(number)
         user=User.query.filter(User.number==number).first()
         video_records=Video_FER_Usage_Record.query.filter(Video_FER_Usage_Record.uid==user.uid).all()
         datas=[]
         for record in video_records:
             vid=record.vid
-            videotime=record.videotime
+            videotime=json.dumps(record.videotime,default=str)
             usagetime=record.usagetime
             datas.append({'vid':vid,'usagetime':usagetime,'videotime':videotime})
         return {'datas':datas,'lens':len(datas)}
@@ -135,12 +136,15 @@ class Picture_usage_record_add(Resource):
         number=request.json['number']
         uid=User.query.filter(User.number==number).first().uid
         result=request.json['result']
-        pricture_address=request.json['picture_address']
-        new_usage_record=Picture_FER_Usage_Record(uid=uid,result=result,pricture_address=pricture_address)
+        picture_address=request.json['picture_address']
+        new_usage_record=Picture_FER_Usage_Record(uid=uid,result=result,picture_address=picture_address)
         try:
+            print("yes")
+            print(new_usage_record)
             db.session.add(new_usage_record)
             db.session.commit()
         except:
+            print("no")
             db.session.rollback()
         return {'msg':"Added successfully"}
 class Video_usage_record_add(Resource):
@@ -179,12 +183,12 @@ def token_required(f):
             print(token)
             try:
                 data = jwt.decode(token,SALT, algorithms=['HS256'])
-                print(data)
-                current_patient = Patient.query.filter(Patient.account==data['account']).first()
-                print(current_patient)
+                #print(data)
+                current_user = User.query.filter(User.number==data['number']).first()
+                print(current_user)
             except:
                 return jsonify({'message' : 'Token is invalid!'}), 401
-        return f(current_patient, *args, **kwargs)
+        return f(current_user, *args, **kwargs)
 
     return decorated
 
@@ -199,8 +203,8 @@ api.add_resource(Video_usage_record_add,'/add_video_record/')
 api.add_resource(Camera_usage_record_add,'/add_camera_record/')
 api.add_resource(Modify_avatar,'/modify_avatar/')
 api.add_resource(Login,'/login/')
-api.add_resource(Modify_name/'modify_name/')
+api.add_resource(Modify_name,'/modify_name/')
 api.add_resource(Register,'/register/')
-api.add_resource(Modify_password/'modifypassword/')
+api.add_resource(Modify_password,'/modifypassword/')
 if __name__ == '__main__':        #运行flask
     app.run(host="localhost",port=5000,debug=True)

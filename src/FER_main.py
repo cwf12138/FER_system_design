@@ -147,6 +147,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.model=model
         self.filename=''
+        self.number='18212139396'
         self.initUI()
 
     def initUI(self):
@@ -161,7 +162,7 @@ class MainWindow(QMainWindow):
         # 创建堆叠窗口和页面
         self.stacked_widget = QStackedWidget()
         #四个功能界面
-        self.face_recognition_page = Picture(self.model)
+        self.face_recognition_page = Picture(self.model,self.number)
         #self.camera_recognition_page = CameraRecognition(self.model)
         #camera_recognition_page = Camera(self.model)
         #self.video_recognition_page = VideoRecognition(self.model)
@@ -222,7 +223,7 @@ class MainWindow(QMainWindow):
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
         self.stacked_widget.removeWidget(widget_to_remove)  
         widget_to_remove.deleteLater()
-        self.face_recognition_page = Picture(self.model)
+        self.face_recognition_page = Picture(self.model,self.number)
         if(self.stacked_widget.indexOf(self.face_recognition_page)==-1):   
             self.stacked_widget.addWidget(self.face_recognition_page)
         self.stacked_widget.setCurrentWidget(self.face_recognition_page)
@@ -284,3 +285,4 @@ if __name__ == '__main__':
     window = MainWindow(model)
     window.show()
     sys.exit(app.exec_())
+  

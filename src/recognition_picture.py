@@ -1,5 +1,7 @@
 import cv2
 import sys
+import requests,json,os
+from datetime import date,datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -16,10 +18,13 @@ sys.path.append('../')
 xemotions = ['anger', 'disgust', 'fear', 'happy', 'sad', 'surprised', 'neutral', 'contempt']
 from recognition import *
 class Picture(QWidget):
-    def __init__(self, model):
+    def __init__(self, model,number):
         super().__init__()
         self.model = model
         self.possibility=[0,0,0,0,0,0,0,0]
+        self.filename=''
+        self.number=number
+        self.emotion='no'
         self.setup_ui()
         
 
@@ -125,15 +130,25 @@ class Picture(QWidget):
                                                                      filter="All Files (*);;Text Files (*.txt)")
         # 显示原图
         if file_name is not None and file_name != "":
+            #这里有一个巨坑的地方，用绝对路径无法正常插入msyql数据库中，只能通过相对路径
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            print(current_dir)
+            relative_path = os.path.relpath(file_name, current_dir)  #这也太强了，之间转换成windows的路径格式
+            self.filename=relative_path
             self.show_raw_img(file_name)  
             emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
            # print(emotion)  这里已经是英文了
+            self.emotion=emotion
             self.possibility=possibility
             #self.barchar=BarChart(xemotions,self.possibility)
             self.vbox_right.removeWidget(self.barchart)
             self.barchart=BarChart(xemotions,list(self.possibility))
             self.vbox_right.addWidget(self.barchart)
-            self.show_results(emotion, possibility)  
+            self.show_results(emotion, possibility) 
+            url='http://127.0.0.1:5000/add_picture_record/'
+            data={"number":self.number,'result':self.emotion,'picture_address':self.filename}
+            response = requests.post(url, json=data)
+
 
     def show_raw_img(self, filename):   #这个部分就是显示图片并更改了大小   #?这个部分是值得参考的，hh
         img = cv2.imread(filename)
@@ -145,7 +160,6 @@ class Picture(QWidget):
     def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         #print(emotion)
-        
         self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
         # 显示emoji
         if emotion != 'no':
