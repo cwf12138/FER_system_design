@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets
 sys.path.append(os.path.dirname(__file__) + '/ui')
 from ui import UI
 
-
+#*已编写更好的展示UI，所以当前UI已弃用，但保留
 def load_cnn_model():
     """
     载入CNN模型

@@ -9,6 +9,8 @@ sys.path.append('../')
 from recognition import *
 
 
+#*这是原来的基于图片的表情设计的UI但是现在有了新的了实现了，所以这部分在就弃用，但保留
+
 class UI(object):
     def __init__(self, form, model):
         self.setup_ui(form)

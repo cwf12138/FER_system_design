@@ -1,4 +1,4 @@
-import sys,cv2,time,requests
+import sys,cv2,time,requests,os
 from PyQt5.QtCore import Qt ,pyqtSlot,pyqtSignal
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
@@ -7,6 +7,8 @@ from qt_material import apply_stylesheet
 from recognition_camera import Camera,load_model
 from recognition_picture import Picture
 from qtupload import Videoupload
+sys.path.append('../')
+from flask.getdata import get_picture_usage_record,get_video_usage_record,get_camera_usage_record
 class UsageRecord(QWidget):
     def __init__(self):
         super().__init__()
@@ -334,8 +336,7 @@ class MainWindow(QMainWindow):
         self.usage_record_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.usage_record_page)
         current_widget_index = self.stacked_widget.currentIndex()
-        #print(current_widget_index)
-
+        #print(current_widget_index)        
 
     
 if __name__ == '__main__':

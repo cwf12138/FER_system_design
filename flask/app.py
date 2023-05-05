@@ -104,7 +104,7 @@ class Picture_usage_record_get(Resource):
             name=user.name
             picture_address=record.picture_address
             result=record.result
-            picturetime=record.picturetime
+            picturetime=json.dumps(record.picturetime,default=str)
             datas.append({'pid':pid,'name':name,'picture_address':picture_address,'result':result,'picturetime':picturetime})
         return {'datas':datas,'lens':len(datas)}
 
@@ -128,7 +128,7 @@ class Camera_usage_record_get(Resource):
         for record in Camera_records:
             cid=record.cid
             cameratime=record.cameratime
-            usagetime=record.usagetime
+            usagetime=json.dumps(record.usagetime,default=str)
             datas.append({'cid':cid,'usagetime':usagetime,'cameratime':cameratime})
         return {'datas':datas,'lens':len(datas)}
     
