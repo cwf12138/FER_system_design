@@ -8,42 +8,29 @@ from recognition_camera import Camera,load_model
 from recognition_picture import Picture
 from recognition_record import Camera_table,Video_table,Picture_table
 from qtupload import Videoupload
+from your_profile import UserDropDown
+from return_to_home import Return_to_home
 sys.path.append('../')
 from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record
 class UsageRecord(QWidget):
-    def __init__(self):
+    def __init__(self,number):
         super().__init__()
+        self.number=number
         self.initUI()
 
     def initUI(self):
         # 添加组件
-        date_label = QLabel('日期：')
-        date_edit = QLineEdit()
-        user_label = QLabel('用户：')
-        user_edit = QLineEdit()
-        action_label = QLabel('操作：')
-        action_edit = QLineEdit()
-
-        # 创建布局管理器
-        hbox1 = QHBoxLayout()
-        hbox1.addWidget(date_label)
-        hbox1.addWidget(date_edit)
-
-        hbox2 = QHBoxLayout()
-        hbox2.addWidget(user_label)
-        hbox2.addWidget(user_edit)
-
-        hbox3 = QHBoxLayout()
-        hbox3.addWidget(action_label)
-        hbox3.addWidget(action_edit)
-
-        self.vbox = QVBoxLayout()
-        self.vbox.addLayout(hbox1)
-        self.vbox.addLayout(hbox2)
-        self.vbox.addLayout(hbox3)
-
-        # 设置布局管理器
-        self.setLayout(self.vbox)
+        data_pciture=get_picture_usage_record(self.number)
+        data_camera=get_camera_usage_record(self.number)
+        data_video= get_video_usage_record(self.number)
+        self.tab_widget=QTabWidget()
+        self.tab_widget.addTab(Picture_table(data_pciture),'picture')
+        self.tab_widget.addTab(Camera_table(data_camera),'camera')
+        self.tab_widget.addTab(Video_table(data_video),'video')
+        main_layout=QHBoxLayout()
+        main_layout.addWidget(self.tab_widget)
+        self.setLayout(main_layout)
+        
 
 
 class FaceRecognition(QWidget):
@@ -156,9 +143,11 @@ class MainWindow(QMainWindow):
     def initUI(self):
         # 添加组件
         self.resize(1000,800)
+        self.setWindowTitle("人脸表情识别系统")
+        #self.setWindowFlags(Qt.FramelessWindowHint)
         main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
-        face_recognition_btn = QPushButton('基于图片的表情识识')
+        face_recognition_btn = QPushButton('基于图片的表情识别')
         camera_recognition_btn = QPushButton('基于摄像头的表情识别')
         video_recognition_btn = QPushButton('基于视频的表情识别')
         usage_record_btn = QPushButton('查看使用记录')
@@ -173,7 +162,7 @@ class MainWindow(QMainWindow):
         #camera_recognition_page = Camera(self.model)
         #self.video_recognition_page = VideoRecognition(self.model)
         self.video_recognition_page=QWidget()
-        self.usage_record_page = UsageRecord()
+        self.usage_record_page = UsageRecord(self.number)
         #添加到堆叠窗口里
         self.stacked_widget.addWidget(self.face_recognition_page)
         self.stacked_widget.addWidget(self.usage_record_page)
@@ -187,14 +176,33 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(self.stacked_widget, '功能')  #当前页面
         #self.tab_widget.addTab(QTextEdit(), '帮助')
-        
+        #用户下拉菜单
+        drop_down_menu=UserDropDown()
+        #返回主页面
+        return_to_home=Return_to_home()
         # 创建布局管理器
 
+
+
+
+        self.icon_label = QLabel(self)
+
+        self.icon_label.setPixmap(QPixmap("./avatar5.jpg"))  # 设置图标图片路径
+        self.icon_label.setFixedSize(50, 50)  # 设置图标大小
+        self.icon_label.setAlignment(Qt.AlignCenter)  # 居中对齐
+        self.icon_label.setScaledContents(True)  # 图片按比例缩放
+        # 设置标签位置和点击事件
+        self.icon_label.move(10, 10)  # 设置图标位置
+        self.icon_label.mousePressEvent = self.return_to_home  # 绑定点击事件
+
         nav_layout = QHBoxLayout()
+        #nav_layout.addWidget(return_to_home)
+        nav_layout.addWidget(self.icon_label)
         nav_layout.addWidget(face_recognition_btn)
         nav_layout.addWidget(camera_recognition_btn)
         nav_layout.addWidget(video_recognition_btn)
         nav_layout.addWidget(usage_record_btn)
+        nav_layout.addWidget(drop_down_menu)
         #nav_layout.addWidget(tab_widget)
         main_layout = QVBoxLayout()
         main_layout.addWidget(title_label, alignment=Qt.AlignCenter)
@@ -222,6 +230,9 @@ class MainWindow(QMainWindow):
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
+    def return_to_home(self, event):
+        # 处理点击事件，这里是返回主页的操作
+        print("返回主页")
     def switch_page(self,page_name):    #每当页面切换时，添加相机表情识别记录
         self.stacked_widget.blockSignals(True) 
         #current=self.stacked_widget.currentIndex()
@@ -333,23 +344,39 @@ class MainWindow(QMainWindow):
         #self.usage_record_page.vbox.addWidget(qbtn)
         if(self.stacked_widget.indexOf(self.usage_record_page)==-1):   
             self.stacked_widget.addWidget(self.usage_record_page)
-        data_pciture=get_picture_usage_record(self.number)
-        data_camera=get_camera_usage_record(self.number)
-        data_video= get_video_usage_record(self.number)
-        self.tab_widget.addTab(Picture_table(data_pciture),'picture')
-        self.tab_widget.addTab(Camera_table(data_camera),'camera')
-        self.tab_widget.addTab(Video_table(data_video),'video')
         self.usage_record_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.usage_record_page)
         current_widget_index = self.stacked_widget.currentIndex()
         #print(current_widget_index)        
 
-    
+class Window1(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("窗口1")
+        self.setGeometry(100, 100, 300, 200)
+
+        layout = QVBoxLayout()
+        label = QLabel("这是窗口1")
+        button = QPushButton("切换到窗口2")
+        button.clicked.connect(self.switch_to_window2)
+
+        layout.addWidget(label)
+        layout.addWidget(button)
+
+        self.setLayout(layout)
+
+    def switch_to_window2(self):
+        self.hide()
+        window2.show()    
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
     model=load_model()
-    window = MainWindow(model)
-    window.show()
+    window2= MainWindow(model)
+    #window2.show()
+    window1=Window1()
+    window1.show()
     sys.exit(app.exec_())
   

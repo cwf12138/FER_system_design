@@ -1,0 +1,13 @@
+/* style.css */
+
+/* 修改 QPushButton 的样式 */
+QPushButton {
+    min-width: 100px;
+    max-width: 200px;
+    min-height: 30px;
+    max-height: 50px;
+    background-color: #FF0000;
+    color: #FFFFFF;
+    font-size: 14px;
+    border: none;
+}
