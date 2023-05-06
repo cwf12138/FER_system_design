@@ -1,6 +1,6 @@
 import sys,cv2,time,requests,os
 from PyQt5.QtCore import Qt ,pyqtSlot,pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap,QIcon,QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame
 from qt_material import apply_stylesheet
@@ -10,6 +10,7 @@ from recognition_record import Camera_table,Video_table,Picture_table
 from qtupload import Videoupload
 from your_profile import UserDropDown
 from return_to_home import Return_to_home
+from login_and_register import LoginWindow,RegisterWindow
 sys.path.append('../')
 from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record
 class UsageRecord(QWidget):
@@ -143,10 +144,13 @@ class MainWindow(QMainWindow):
     def initUI(self):
         # 添加组件
         self.resize(1000,800)
-        self.setWindowTitle("人脸表情识别系统")
+        self.setWindowIcon(QIcon("./avatar3.jpg"))  # 设置窗口图标
+        #self.setWindowIcon(QIcon())  #设置窗口图标为空
+        self.setWindowTitle(" ")
         #self.setWindowFlags(Qt.FramelessWindowHint)
         main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
+        title_label.setFont(QFont("Arial", 18, QFont.Bold))
         face_recognition_btn = QPushButton('基于图片的表情识别')
         camera_recognition_btn = QPushButton('基于摄像头的表情识别')
         video_recognition_btn = QPushButton('基于视频的表情识别')
@@ -349,34 +353,18 @@ class MainWindow(QMainWindow):
         current_widget_index = self.stacked_widget.currentIndex()
         #print(current_widget_index)        
 
-class Window1(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("窗口1")
-        self.setGeometry(100, 100, 300, 200)
+  
 
-        layout = QVBoxLayout()
-        label = QLabel("这是窗口1")
-        button = QPushButton("切换到窗口2")
-        button.clicked.connect(self.switch_to_window2)
-
-        layout.addWidget(label)
-        layout.addWidget(button)
-
-        self.setLayout(layout)
-
-    def switch_to_window2(self):
-        self.hide()
-        window2.show()    
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
     model=load_model()
-    window2= MainWindow(model)
+    windowMain= MainWindow(model)
     #window2.show()
-    window1=Window1()
-    window1.show()
+    windowLogin=LoginWindow(windowMain)
+    windowRegister=RegisterWindow(windowLogin)
+    windowLogin.show()
     sys.exit(app.exec_())
   

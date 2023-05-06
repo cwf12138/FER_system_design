@@ -8,7 +8,7 @@ import requests,json
 from flask_cors import CORS
 from functools import wraps
 from external import db
-from models import Admin,User,Picture_FER_Usage_Record,Video_FER_Usage_Record,Camera_FER_Usage_Record
+from models import User,Picture_FER_Usage_Record,Video_FER_Usage_Record,Camera_FER_Usage_Record
 from datetime import date,datetime
 import jwt
 app = Flask(__name__)
@@ -29,29 +29,39 @@ class Login(Resource):
         number=request.json['number']
         password=request.json['password']
         if not number or not password:
-            return {'msg':'number or password is missing'}
+            return {'msg':'账号或密码为空','flag':'0'}
         user=User.query.filter(User.number==number).first()
-        if check_password_hash(user.password, password):
-            token = jwt.encode({'number' : number, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},key=SALT, algorithm="HS256", headers=headers)
-            return jsonify({'token' : token.encode('UTF-8').decode('UTF-8')})
+        if not user:
+            return {'msg':'该用户不存在','flag':'0'}
+        else :
+             if check_password_hash(user.password, password):
+                return {'msg':'登录成功','flag':'1'}
+             else :
+                return {'msg':'密码不正确','flag':'0'}
 
 class Register(Resource):
     def post(self):
         number=request.json['number']
-        password=request.json['number']
+        password=request.json['password']
+        name=request.json['username']
         hash_password=generate_password_hash(password, method='sha256')
         user=User.query.filter(User.number==number).first()
         if not user :
             try:
-                new_user=User(number=number,password=hash_password,permisson='0')
+                new_user=User(number=number,password=hash_password,name=name)
                 db.session.add(new_user)
                 db.session.commit()
             except:
                 db.session.rollback()
-            return {'msg':'Successfully added a new user'}
+            return {'msg':'注册成功','flag':'1'}
         else :
-            return {'msg':'This phone number has already been registered, please try again with another phone number'}
-        return {"meg":"register is false"}
+            try:
+                user.password=hash_password
+                db.session.commit()
+            except:
+                db.session.rollback()
+            return {'msg':'找回密码密码成功','flag':'1'}
+        return {'msg':'注册出错','flag':'0'}
 class Modify_password(Resource):
     def post(self):
         number=request.json["number"]

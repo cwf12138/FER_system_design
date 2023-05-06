@@ -10,19 +10,20 @@ class User(db.Model):
     number = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(500))
     avatar = db.Column(db.String(500))
-    permission = db.Column(db.String(50))
     picture_records = db.relationship('Picture_FER_Usage_Record', backref='Puser', cascade='all, delete-orphan', passive_deletes = True)
     video_records = db.relationship('Video_FER_Usage_Record', backref='Vuser', cascade='all, delete-orphan', passive_deletes = True)
     camera_records = db.relationship('Camera_FER_Usage_Record', backref='Cuser', cascade='all, delete-orphan', passive_deletes = True)
 
-class Admin(db.Model):
+
+#取消了管理员功能，发现和系统的用途不匹配，觉得管理员用处不大
+'''class Admin(db.Model):  
     __tablename__="admin"
     aid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
     name = db.Column(db.String(50))
     number = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(500))
     avater = db.Column(db.String(500))
-    permission = db.Column(db.String(50))
+    permission = db.Column(db.String(50))'''
 
 class Picture_FER_Usage_Record(db.Model):
     __tablename__="picture"
