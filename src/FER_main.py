@@ -10,7 +10,7 @@ from recognition_record import Camera_table,Video_table,Picture_table
 from qtupload import Videoupload
 from your_profile import UserDropDown
 from return_to_home import Return_to_home
-from login_and_register import LoginWindow,RegisterWindow
+#from login_and_register import LoginWindow,RegisterWindow
 sys.path.append('../')
 from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record
 class UsageRecord(QWidget):
@@ -134,11 +134,11 @@ class VideoRecognition(QWidget):
 
 #Qwidget
 class MainWindow(QMainWindow):
-    def __init__(self,model):
+    def __init__(self,model,number):
         super().__init__()
         self.model=model
         self.filename=''
-        self.number='18212139396'
+        self.number=number
         self.initUI()
 
     def initUI(self):
@@ -361,10 +361,12 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
     model=load_model()
-    windowMain= MainWindow(model)
+    number='18212139396'
+    windowMain= MainWindow(model,number)
+    windowMain.show()
     #window2.show()
-    windowLogin=LoginWindow(windowMain)
-    windowRegister=RegisterWindow(windowLogin)
-    windowLogin.show()
+    # windowLogin=LoginWindow(windowMain)
+    # windowRegister=RegisterWindow(windowLogin)
+    # windowLogin.show()
     sys.exit(app.exec_())
   

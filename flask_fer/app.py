@@ -43,12 +43,12 @@ class Register(Resource):
     def post(self):
         number=request.json['number']
         password=request.json['password']
-        name=request.json['username']
+        #name=request.json['username']
         hash_password=generate_password_hash(password, method='sha256')
         user=User.query.filter(User.number==number).first()
         if not user :
             try:
-                new_user=User(number=number,password=hash_password,name=name)
+                new_user=User(number=number,password=hash_password)
                 db.session.add(new_user)
                 db.session.commit()
             except:
