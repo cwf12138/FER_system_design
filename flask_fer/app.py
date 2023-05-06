@@ -127,8 +127,8 @@ class Camera_usage_record_get(Resource):
         datas=[]
         for record in Camera_records:
             cid=record.cid
-            cameratime=record.cameratime
-            usagetime=json.dumps(record.usagetime,default=str)
+            cameratime=json.dumps(record.cameratime,default=str)
+            usagetime=record.usagetime
             datas.append({'cid':cid,'usagetime':usagetime,'cameratime':cameratime})
         return {'datas':datas,'lens':len(datas)}
     

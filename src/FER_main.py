@@ -6,9 +6,10 @@ from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QM
 from qt_material import apply_stylesheet
 from recognition_camera import Camera,load_model
 from recognition_picture import Picture
+from recognition_record import Camera_table,Video_table,Picture_table
 from qtupload import Videoupload
 sys.path.append('../')
-from flask.getdata import get_picture_usage_record,get_video_usage_record,get_camera_usage_record
+from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record
 class UsageRecord(QWidget):
     def __init__(self):
         super().__init__()
@@ -185,7 +186,7 @@ class MainWindow(QMainWindow):
         # 创建标签页
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(self.stacked_widget, '功能')  #当前页面
-        self.tab_widget.addTab(QTextEdit(), '帮助')
+        #self.tab_widget.addTab(QTextEdit(), '帮助')
         
         # 创建布局管理器
 
@@ -210,7 +211,7 @@ class MainWindow(QMainWindow):
         usage_record_btn.clicked.connect(self.add_and_show_record)
 
         self.stacked_widget.currentChanged.connect(self.switch_page)  #检测页面切换
-        self.stacked_widget.blockSignals(True) 
+        self.stacked_widget.blockSignals(True)   #信号锁
         qbtn=QPushButton('进行人脸表情识别')
         #self.video_recognition_page_load = Videoupload(self.model)
         self.video_recognition_page_load.vbox.addWidget(qbtn)
@@ -270,7 +271,6 @@ class MainWindow(QMainWindow):
         self.stacked_widget.setCurrentWidget(self.face_recognition_page)
         #print(str(current_widget_index)+'aaaa')
         current_widget_index = self.stacked_widget.currentIndex()
-        
     #视频上传
 
     def add_and_show_video_uplaoad(self):
@@ -333,6 +333,12 @@ class MainWindow(QMainWindow):
         #self.usage_record_page.vbox.addWidget(qbtn)
         if(self.stacked_widget.indexOf(self.usage_record_page)==-1):   
             self.stacked_widget.addWidget(self.usage_record_page)
+        data_pciture=get_picture_usage_record(self.number)
+        data_camera=get_camera_usage_record(self.number)
+        data_video= get_video_usage_record(self.number)
+        self.tab_widget.addTab(Picture_table(data_pciture),'picture')
+        self.tab_widget.addTab(Camera_table(data_camera),'camera')
+        self.tab_widget.addTab(Video_table(data_video),'video')
         self.usage_record_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.usage_record_page)
         current_widget_index = self.stacked_widget.currentIndex()
