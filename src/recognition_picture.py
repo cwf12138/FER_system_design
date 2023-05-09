@@ -134,7 +134,9 @@ class Picture(QWidget):
             current_dir = os.path.dirname(os.path.abspath(__file__))
             print(current_dir)
             relative_path = os.path.relpath(file_name, current_dir)  #这也太强了，之间转换成windows的路径格式
-            self.filename=relative_path
+            #这里可以已经不需要相对路径了，
+            #self.filename=relative_path
+            self.filename=file_name
             self.show_raw_img(file_name)  
             emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
            # print(emotion)  这里已经是英文了

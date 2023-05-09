@@ -2,7 +2,7 @@ import sys,cv2,time,requests,os
 from PyQt5.QtCore import Qt ,pyqtSlot,pyqtSignal
 from PyQt5.QtGui import QPixmap,QIcon,QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame
+from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame,QMenu,QAction
 from qt_material import apply_stylesheet
 from recognition_camera import Camera,load_model
 from recognition_picture import Picture
@@ -134,11 +134,12 @@ class VideoRecognition(QWidget):
 
 #Qwidget
 class MainWindow(QMainWindow):
-    def __init__(self,model,number):
+    def __init__(self,model,number,window):
         super().__init__()
         self.model=model
         self.filename=''
         self.number=number
+        self.window=window
         self.initUI()
 
     def initUI(self):
@@ -176,17 +177,54 @@ class MainWindow(QMainWindow):
         #stacked_widget.addWidget(video_recognition_page)
         #stacked_widget.addWidget(usage_record_page)
 
-        # 创建标签页
-        self.tab_widget = QTabWidget()
-        self.tab_widget.addTab(self.stacked_widget, '功能')  #当前页面
+        #*创建标签页  重要
+        #self.tab_widget = QTabWidget()
+        #self.tab_widget.addTab(self.stacked_widget,' ')  #当前页面
         #self.tab_widget.addTab(QTextEdit(), '帮助')
+
+
+
+        #用户下拉菜单
+        self.button = QPushButton()
+        self.button.setFixedSize(40, 40)
+        icon = QIcon("./avatar2.jpg")  # 替换为您自己的图标路径
+        pixmap = icon.pixmap(40, 40)  # 调整图标大小为 40x40 像素
+        #self.button.setIcon(QIcon('./avatar2.jpg'))
+        self.button.setIcon(QIcon(pixmap))
+        self.button.setIconSize(self.button.size())
+        #font = self.button.font()
+        #font.setPointSize(50)  # 设置字体大小为20
+        #self.button.setFont(font)
+        #self.button.setIconSize(Qt.Size(24, 24))
+        self.button.setStyleSheet("QPushButton {border: none;}")
+
+        # 创建一个下拉菜单
+        self.menu = QMenu(self)
+        self.menu.setStyleSheet("QMenu {background-color: white; border: 1px solid gray;}")
+        self.menu.setFixedWidth(200)
+
+        # 添加菜单项
+        self.menu.addAction('你的个人资料')
+        self.menu.addAction('设置')
+        #self.menu.addAction('退出')
+        action3=QAction('退出',self)
+        action3.triggered.connect(self.return_to_login)
+        self.menu.addAction(action3)
+        #self.menu.addAction('Your profile')
+        #self.menu.addAction('Settings')
+        #self.menu.addAction('Sign out')
+        # 将菜单添加到按钮中
+        self.button.setMenu(self.menu)
+
+
+
+
+
         #用户下拉菜单
         drop_down_menu=UserDropDown()
         #返回主页面
         return_to_home=Return_to_home()
         # 创建布局管理器
-
-
 
 
         self.icon_label = QLabel(self)
@@ -206,14 +244,23 @@ class MainWindow(QMainWindow):
         nav_layout.addWidget(camera_recognition_btn)
         nav_layout.addWidget(video_recognition_btn)
         nav_layout.addWidget(usage_record_btn)
-        nav_layout.addWidget(drop_down_menu)
+        #nav_layout.addWidget(drop_down_menu)
+        nav_layout.addWidget(self.button)
         #nav_layout.addWidget(tab_widget)
         main_layout = QVBoxLayout()
         main_layout.addWidget(title_label, alignment=Qt.AlignCenter)
         main_layout.addLayout(nav_layout)
-        main_layout.addWidget(self.tab_widget)
-
-
+        #分割线
+        separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
+        separator_line_h.setFrameShape(QFrame.HLine)
+        separator_line_h.setFrameShadow(QFrame.Sunken)
+        # separator_line_hf = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
+        # separator_line_hf.setFrameShape(QFrame.HLine)
+        # separator_line_hf.setFrameShadow(QFrame.Sunken)
+        main_layout.addWidget(separator_line_h)
+        #main_layout.addWidget(separator_line_hf)
+        #main_layout.addWidget(self.tab_widget)
+        main_layout.addWidget(self.stacked_widget)
         # 设置布局管理器
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
@@ -234,6 +281,9 @@ class MainWindow(QMainWindow):
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
+    def return_to_login(self):
+        self.close()
+        self.window.show()
     def return_to_home(self, event):
         # 处理点击事件，这里是返回主页的操作
         print("返回主页")

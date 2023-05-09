@@ -95,7 +95,7 @@ class LoginWindow(QWidget):
         print(self.flag)
         if self.flag=='1':
             self.hide()
-            window=MainWindow(load_model(),number)
+            window=MainWindow(load_model(),number,self)
             window.show()
 
 class RegisterWindow(QWidget):

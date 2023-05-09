@@ -13,7 +13,8 @@ class UserDropDown(QWidget):
 
         # 创建一个按钮
         self.button = QPushButton()
-        #self.button.setFixedSize(30, 30)
+        self.button.setFixedSize(30, 30)
+        
         self.button.setIcon(QIcon('./avatar2.jpg'))
         #font = self.button.font()
         #font.setPointSize(50)  # 设置字体大小为20
