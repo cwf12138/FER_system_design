@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout, QDesktopWidget
 from PyQt5.QtGui import QFont, QIcon,QPixmap
 from PyQt5.QtCore import Qt
 import requests,json
@@ -14,11 +14,19 @@ class LoginWindow(QWidget):
         self.setStyleSheet("background-color: #f6f8fa;")  # 设置窗口背景色
         self.msg=''
         self.flag=''
+        self.width=280
+        self.height=400
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        self.setFixedSize(self.width, self.height)
+        
+        screen_geometry = QDesktopWidget().availableGeometry()
+        screen_center = screen_geometry.center()
 
+        # 计算窗口的左上角坐标，使其居中显示
+        self.move(screen_center - self.rect().center())
         # GitHub icon
         icon_label = QLabel(self)
         icon_label.setPixmap(QPixmap("./avatar.jpg").scaled(64, 64))  # 设置图标大小
@@ -35,7 +43,9 @@ class LoginWindow(QWidget):
         # Username input
         #lbl_username = QLabel("Username or email address", self)
         lbl_username = QLabel("账号", self)
+        lbl_username.setStyleSheet("font-size: 18px;") #修改字体样式
         self.txt_username = QLineEdit()
+        self.txt_username.setStyleSheet("font-size: 20px;")
         self.txt_username.setPlaceholderText("手机号")  # 设置提示文本
         layout.addWidget(lbl_username)
         layout.addWidget(self.txt_username)
@@ -43,6 +53,7 @@ class LoginWindow(QWidget):
         # Password input
         #lbl_password = QLabel("Password", self)
         lbl_password = QLabel("密码", self)
+        lbl_password.setStyleSheet("font-size: 18px;") #修改字体样式
         self.txt_password = QLineEdit()
         self.txt_password.setEchoMode(QLineEdit.Password)
         layout.addWidget(lbl_password)
@@ -56,6 +67,7 @@ class LoginWindow(QWidget):
 
         # Forgot password link
         forgot_password_label = QLabel('找回密码或注册新用户', self)
+        forgot_password_label.setStyleSheet("font-size: 14px;") #修改字体样式
         forgot_password_label.setAlignment(Qt.AlignRight)
         forgot_password_label.mousePressEvent = self.jump_to_register  # 绑定点击事件
         layout.addWidget(forgot_password_label)
@@ -108,10 +120,17 @@ class RegisterWindow(QWidget):
         self.setStyleSheet("background-color: #f6f8fa;")  # 设置窗口背景色
         self.msg=''
         self.flag=''
+        self.width=280
+        self.height=400
         self.setup_ui()
 
     def setup_ui(self):
         layout = QVBoxLayout()
+        screen_geometry = QDesktopWidget().availableGeometry()
+        screen_center = screen_geometry.center()
+        self.setFixedSize(self.width, self.height)
+        # 计算窗口的左上角坐标，使其居中显示
+        self.move(screen_center - self.rect().center())
 
         # GitHub icon
         icon_label = QLabel(self)
@@ -136,7 +155,9 @@ class RegisterWindow(QWidget):
         # Username input
         #lbl_username = QLabel("Username or email address", self)
         lbl_number = QLabel("账号", self)
+        lbl_number.setStyleSheet("font-size: 18px;") #修改字体样式
         self.txt_number = QLineEdit()
+        self.txt_number.setStyleSheet("font-size: 20px;")
         self.txt_number.setPlaceholderText("手机号")  # 设置提示文本
         layout.addWidget(lbl_number)
         layout.addWidget(self.txt_number)
@@ -144,6 +165,7 @@ class RegisterWindow(QWidget):
         # Password input
         #lbl_password = QLabel("Password", self)
         lbl_password = QLabel("密码", self)
+        lbl_password.setStyleSheet("font-size: 18px;") #修改字体样式
         self.txt_password = QLineEdit()
         self.txt_password.setEchoMode(QLineEdit.Password)
         self.txt_password.setPlaceholderText("最少6位")  # 设置提示文本
@@ -158,6 +180,7 @@ class RegisterWindow(QWidget):
 
         # Forgot password link
         forgot_password_label = QLabel('返回登录', self)
+        forgot_password_label.setStyleSheet("font-size: 14px;") #修改字体样式
         forgot_password_label.setAlignment(Qt.AlignRight)
         layout.addWidget(forgot_password_label)
         forgot_password_label.mousePressEvent = self.jump_to_login 
