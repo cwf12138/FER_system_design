@@ -76,8 +76,10 @@ class UserProfile(QWidget):
 
         btn_update_password=QPushButton("更新密码")
         btn_update_password.clicked.connect(self.update_password)
-        
-       
+        #修改密码提示信息
+        self.lbl_message = QLabel(self)
+        self.lbl_message.setAlignment(Qt.AlignCenter)
+        self.lbl_message.setStyleSheet("font-size: 18px;")
         #right_layout.setSpacing(0)
         #使用Qfromlayout可以使得每一个表情距离变近，距离更小
         update_username=QFormLayout()       
@@ -98,6 +100,7 @@ class UserProfile(QWidget):
         update_password.addRow(self.confirm_new_password)
         update_password.addRow(btn_update_password)
         right_layout.addLayout(update_password)
+        right_layout.addWidget(self.lbl_message)
 
          # 将布局添加到主布局中
         main_layout.addLayout(left_layout)
@@ -120,7 +123,7 @@ class UserProfile(QWidget):
             self.avatar_label.setPixmap(avatar_pixmap)
 
 
-        print("Change Avatar")
+        #print("Change Avatar")
     def modify_username(self):
         name=self.text_username.text()
         data={'number':self.number,'name':name}
@@ -130,8 +133,24 @@ class UserProfile(QWidget):
         self.name=name
         self.username_label.setText(self.name)
         self.text_username.setPlaceholderText(self.name)  # 设置提示文本
-        print(self.text_username.text())
+        #print(self.text_username.text())
     def update_password(self):
+        get_old_password=self.old_password.text()
+        get_new_password=self.new_password.text()
+        get_confirm_new_password=self.confirm_new_password.text()
+        self.msg=""
+        if get_new_password==get_confirm_new_password:
+            url="http://127.0.0.1:5000/modify_password/"
+            data={'number':self.number,'oldpassword':get_old_password,'newpassword':get_new_password}
+            response = requests.post(url,json=data)
+            datas=json.loads(response.content.decode('utf-8'))
+            self.msg=datas['msg']
+        else:
+            self.msg="两次的新密码输入不一致"
+        self.lbl_message.setText(self.msg)
+
+
+
         print(self.new_password.text())
 
 if __name__ == "__main__":

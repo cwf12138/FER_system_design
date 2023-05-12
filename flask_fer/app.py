@@ -232,6 +232,6 @@ api.add_resource(Modify_avatar,'/modify_avatar/')
 api.add_resource(Login,'/login/')
 api.add_resource(Modify_name,'/modify_name/')
 api.add_resource(Register,'/register/')
-api.add_resource(Modify_password,'/modifypassword/')
+api.add_resource(Modify_password,'/modify_password/')
 if __name__ == '__main__':        #运行flask
     app.run(host="localhost",port=5000,debug=True)
