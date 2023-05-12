@@ -11,8 +11,9 @@ from qtupload import Videoupload
 from your_profile import UserDropDown
 from return_to_home import Return_to_home
 #from login_and_register import LoginWindow,RegisterWindow
-sys.path.append('../')
+from user_profile import UserProfile
 from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record,get_user_profile
+sys.path.append('../')
 class UsageRecord(QWidget):
     def __init__(self,number):
         super().__init__()
@@ -170,6 +171,7 @@ class MainWindow(QMainWindow):
         main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
         title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        #获取用户信息
         profile=get_user_profile(self.number)
         print(profile['avatar'])
         print(profile['name'])
@@ -185,14 +187,19 @@ class MainWindow(QMainWindow):
         self.stacked_widget = QStackedWidget()
         #主页面
         self.homepage=Return_to_homepage(self.name)
-        #四个功能界面
+        #图片表情识别
         self.face_recognition_page = Picture(self.model,self.number)
+        #个人资料界面
+        self.userprofile_page=UserProfile(self.name,self.avatar,self.number)
         #self.camera_recognition_page = Camera(self.model)
+        #摄像头表情识别
         self.camera_recognition_page=QWidget()
         self.camera_recognition_page.setVisible(False)
+        #视频上传界面
         self.video_recognition_page_load = Videoupload(self.model)
         #camera_recognition_page = Camera(self.model)
         #self.video_recognition_page = VideoRecognition(self.model)
+        #视频表情识别
         self.video_recognition_page=QWidget()
         self.usage_record_page = UsageRecord(self.number)
         #添加到堆叠窗口里
@@ -201,6 +208,8 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.usage_record_page)
         #self.stacked_widget.addWidget(self.camera_recognition_page)
         self.stacked_widget.addWidget(self.video_recognition_page_load)
+        self.stacked_widget.addWidget(self.userprofile_page)
+        
         #self.camera_recognition_page.setVisible(False)
         #stacked_widget.addWidget(video_recognition_page)
         #stacked_widget.addWidget(usage_record_page)
@@ -233,19 +242,21 @@ class MainWindow(QMainWindow):
         self.menu.setFixedWidth(200)
 
         # 添加菜单项
-        self.menu.addAction('你的个人资料')
-        self.menu.addAction('设置')
+        #self.menu.addAction('你的个人资料')
+        action1=QAction('你的个人资料',self)
+        action1.triggered.connect(self.open_userprofile)
+        self.menu.addAction(action1)
+
+        #self.menu.addAction('设置')
         #self.menu.addAction('退出')
-        action3=QAction('退出',self)
-        action3.triggered.connect(self.return_to_login)
-        self.menu.addAction(action3)
+        action2=QAction('退出',self)
+        action2.triggered.connect(self.return_to_login)
+        self.menu.addAction(action2)
         #self.menu.addAction('Your profile')
         #self.menu.addAction('Settings')
         #self.menu.addAction('Sign out')
         # 将菜单添加到按钮中
         self.button.setMenu(self.menu)
-
-
 
 
 
@@ -315,6 +326,22 @@ class MainWindow(QMainWindow):
     def return_to_login(self):
         self.close()
         self.window.show()
+    def open_userprofile(self):
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(str(current_widget_index)+'ggg')  
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.currentWidget().setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
+        #self.face_recognition_page = Picture(self.model,self.number)
+        if(self.stacked_widget.indexOf(self.userprofile_page)==-1):   
+            self.stacked_widget.addWidget(self.userprofile_page)
+        self.userprofile_page.setVisible(True)
+        self.stacked_widget.setCurrentWidget(self.userprofile_page)
+        #print(str(current_widget_index)+'aaaa')
+        #current_widget_index = self.stacked_widget.currentIndex()
+        print('xx')
     def return_to_home(self, event):
         # 处理点击事件，这里是返回主页的操作
         current_widget_index = self.stacked_widget.currentIndex()

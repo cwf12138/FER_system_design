@@ -29,7 +29,7 @@ class UserDropDown(QWidget):
 
         # 添加菜单项
         self.menu.addAction('你的个人资料')
-        self.menu.addAction('设置')
+        #self.menu.addAction('设置')
         self.menu.addAction('退出')
         #self.menu.addAction('Your profile')
         #self.menu.addAction('Settings')

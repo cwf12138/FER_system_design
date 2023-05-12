@@ -1,12 +1,14 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QLineEdit,QFormLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QLineEdit,QFormLayout,QFrame
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QSize
-
+import requests,json
 from qt_material import apply_stylesheet
-class MainWindow(QWidget):
-    def __init__(self,name):
+class UserProfile(QWidget):
+    def __init__(self,name,avatar,number):
         super().__init__()
         self.name=name
+        self.avatar=avatar
+        self.number=number
 
         # 设置窗口标题
         self.setWindowTitle("User Profile")
@@ -17,7 +19,7 @@ class MainWindow(QWidget):
         right_layout = QVBoxLayout()
 
         # 左半部分布局
-        avatar_label = QLabel(self)
+        avatar_label = QLabel(self)     #头像
         avatar_label.setFixedSize(300, 300)
         avatar_label.setScaledContents(True)
         avatar_label.setAlignment(Qt.AlignCenter)
@@ -25,73 +27,79 @@ class MainWindow(QWidget):
             border: 2px solid #ccc;
             border-radius: 50px;
         """)
-        avatar_label.mousePressEvent = self.change_avatar
-
-        avatar_image = QImage("./photo1.jpg")
+        avatar_label.mousePressEvent = self.change_avatar  
+        #头像地址
+        avatar_image = QImage(self.avatar)   
         avatar_pixmap = QPixmap.fromImage(avatar_image)
         avatar_label.setPixmap(avatar_pixmap)
-
-        username_label = QLabel("John Doe", self)
-        username_label.setAlignment(Qt.AlignCenter)
-        username_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        #头像下方的用户名
+        self.username_label = QLabel(self.name, self)
+        self.username_label.setAlignment(Qt.AlignCenter)
+        self.username_label.setStyleSheet("font-size: 23px; font-weight: bold;")
 
         left_layout.addWidget(avatar_label)
-        left_layout.addWidget(username_label)
+        left_layout.addWidget(self.username_label)
         left_layout.addStretch()
 
         # 右半部分布局
         #修改用户名
+        label_username=QLabel("修改用户名")
+        label_username.setStyleSheet("font-size: 23px; font-weight: bold;")
         self.text_username=QLineEdit()
-        self.text_username.setStyleSheet("font-size: 20px;")
+        self.text_username.setStyleSheet("font-size: 25px;")
         self.text_username.setPlaceholderText(self.name)  # 设置提示文本
-        btn_modifyusername=QPushButton('修改用户名')
+        btn_modifyusername=QPushButton('更新用户名')
         btn_modifyusername.clicked.connect(self.modify_username)
 
+        #水平分割线
+        self.line2 = QFrame()
+        self.line2.setFrameShape(QFrame.HLine)
+        self.line2.setFrameShadow(QFrame.Sunken)
         #修改密码
         label_password=QLabel("修改密码")
-        label_password.setStyleSheet("font-size: 18px; font-weight: bold;")
+        label_password.setStyleSheet("font-size: 23px; font-weight: bold;") #修改字体样式
+        
         old_password=QLabel("旧密码")
+        old_password.setStyleSheet("font-size :18px;")
         self.old_password=QLineEdit()
         self.old_password.setEchoMode(QLineEdit.Password)
+
         new_password=QLabel("新密码")
+        new_password.setStyleSheet("font-size :18px;")
         self.new_password=QLineEdit()
         self.new_password.setEchoMode(QLineEdit.Password)
+
         confirm_new_password=QLabel("确认新密码")
+        confirm_new_password.setStyleSheet("font-size :18px;")
         self.confirm_new_password=QLineEdit()
         self.confirm_new_password.setEchoMode(QLineEdit.Password)
+
         btn_update_password=QPushButton("更新密码")
         btn_update_password.clicked.connect(self.update_password)
         
-        # 将布局添加到主布局中
+       
         #right_layout.setSpacing(0)
-        update_username=QFormLayout()
+        #使用Qfromlayout可以使得每一个表情距离变近，距离更小
+        update_username=QFormLayout()       
+        update_username.addRow(label_username)    #修改用户名部分
         update_username.addRow(self.text_username)
         update_username.addRow(btn_modifyusername)
-        #right_layout.addWidget(self.text_username)
-        #right_layout.addWidget(btn_modifyusername)
         right_layout.addLayout(update_username)
 
         #right_layout.addWidget(label_passowrd)
         update_password=QFormLayout()
-        update_password.addRow(label_password)
+        update_password.addRow(label_password)     #修改密码部分
+        update_password.addRow(self.line2)
         update_password.addRow(old_password)
         update_password.addRow(self.old_password)
         update_password.addRow(new_password)
-        update_username.setSpacing(20)
         update_password.addRow(self.new_password)
         update_password.addRow(confirm_new_password)
         update_password.addRow(self.confirm_new_password)
         update_password.addRow(btn_update_password)
         right_layout.addLayout(update_password)
 
-        # right_layout.addWidget(old_password)
-        # right_layout.addWidget(self.old_password)
-        # right_layout.addWidget(new_password)
-        
-        # right_layout.addWidget(self.new_password)
-        # right_layout.addWidget(confirm_new_password)
-        # right_layout.addWidget(self.confirm_new_password)
-        # right_layout.addWidget(btn_update_password)
+         # 将布局添加到主布局中
         main_layout.addLayout(left_layout)
         main_layout.addLayout(right_layout)
 
@@ -101,6 +109,14 @@ class MainWindow(QWidget):
         # 处理头像点击事件，实现头像更换逻辑
         print("Change Avatar")
     def modify_username(self):
+        name=self.text_username.text()
+        data={'number':self.number,'name':name}
+        url="http://127.0.0.1:5000/modify_name/"
+        response = requests.post(url,json=data)
+        datas=json.loads(response.content.decode('utf-8'))
+        self.name=name
+        self.username_label.setText(self.name)
+        self.text_username.setPlaceholderText(self.name)  # 设置提示文本
         print(self.text_username.text())
     def update_password(self):
         print(self.new_password.text())
@@ -108,6 +124,9 @@ class MainWindow(QWidget):
 if __name__ == "__main__":
     app = QApplication([])
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
-    window = MainWindow('cwf')
+    name='gzu-cwf'
+    avatar='C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg'
+    number='18212139396'
+    window = UserProfile(name,avatar,number)
     window.show()
     app.exec_()

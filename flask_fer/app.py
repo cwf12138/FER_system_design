@@ -75,9 +75,9 @@ class Modify_password(Resource):
                 db.session.commit()
             except:
                 db.session.rollback()
-            return {"msg":"password has been updated"}
+            return {"msg":"密码修改成功"}
         else:
-            return {"msg":"Incorrect initial password"}
+            return {"msg":"原密码不正确"}
 
 class Modify_name(Resource):
     def post(self):
@@ -89,7 +89,7 @@ class Modify_name(Resource):
             db.session.commit()
         except:
             db.session.rollback()
-        return {'msg':'Successfully modified username'}
+        return {'msg':'用户名修改成功'}
 
 class Modify_avatar(Resource):
     def post(self):
