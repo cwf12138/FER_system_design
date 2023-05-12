@@ -14,17 +14,6 @@ class User(db.Model):
     video_records = db.relationship('Video_FER_Usage_Record', backref='Vuser', cascade='all, delete-orphan', passive_deletes = True)
     camera_records = db.relationship('Camera_FER_Usage_Record', backref='Cuser', cascade='all, delete-orphan', passive_deletes = True)
 
-
-#取消了管理员功能，发现和系统的用途不匹配，觉得管理员用处不大
-'''class Admin(db.Model):  
-    __tablename__="admin"
-    aid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
-    name = db.Column(db.String(50))
-    number = db.Column(db.String(50), primary_key=True)
-    password = db.Column(db.String(500))
-    avater = db.Column(db.String(500))
-    permission = db.Column(db.String(50))'''
-
 class Picture_FER_Usage_Record(db.Model):
     __tablename__="picture"
     pid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
@@ -48,3 +37,12 @@ class Camera_FER_Usage_Record(db.Model):
     cameratime = db.Column(db.DateTime, default=datetime.now)
     usagetime = db.Column(db.Integer)
 
+#取消了管理员功能，发现和系统的用途不匹配，觉得管理员用处不大
+'''class Admin(db.Model):  
+    __tablename__="admin"
+    aid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    name = db.Column(db.String(50))
+    number = db.Column(db.String(50), primary_key=True)
+    password = db.Column(db.String(500))
+    avater = db.Column(db.String(500))
+    permission = db.Column(db.String(50))'''

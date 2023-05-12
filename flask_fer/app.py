@@ -103,6 +103,16 @@ class Modify_avatar(Resource):
             db.session.rollback()
         return {'msg':"Successfully modified the profile picture"}
         
+class Get_user_profile(Resource):
+    def get(self,number):
+        user=User.query.filter(User.number==number).first()
+        datas=[]
+        name=user.name
+        avatar=user.avatar
+        datas.append({'name':name,'avatar':avatar})
+        return {'datas':datas}
+
+
 
 class Picture_usage_record_get(Resource):
     def get(self,number):
@@ -211,7 +221,7 @@ def token_required(f):
 
 
 
-
+api.add_resource(Get_user_profile,'/get_user_profile/<string:number>')
 api.add_resource(Picture_usage_record_get,'/get_picture_record/<string:number>')
 api.add_resource(Video_usage_record_get,'/get_video_record/<string:number>')
 api.add_resource(Camera_usage_record_get,'/get_camera_record/<string:number>')

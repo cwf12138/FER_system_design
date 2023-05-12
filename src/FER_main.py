@@ -12,7 +12,7 @@ from your_profile import UserDropDown
 from return_to_home import Return_to_home
 #from login_and_register import LoginWindow,RegisterWindow
 sys.path.append('../')
-from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record
+from getdata import get_picture_usage_record,get_camera_usage_record,get_video_usage_record,get_user_profile
 class UsageRecord(QWidget):
     def __init__(self,number):
         super().__init__()
@@ -132,6 +132,24 @@ class VideoRecognition(QWidget):
         # 设置布局管理器
         self.setLayout(hbox)
 
+class Return_to_homepage(QWidget):
+    def __init__(self,name):
+        super().__init__()
+        self.name=name
+        self.initUI()
+    def initUI(self):
+        welcome_label=QLabel("欢迎使用人脸表情识别系统")
+        welcome_label.setAlignment(Qt.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        label = QLabel(f"尊敬的{self.name}用户!",self)
+        #label.setGeometry(100, 80, 200, 40)
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        vbox=QVBoxLayout()
+        vbox.addWidget(welcome_label)
+        vbox.addWidget(label)
+        self.setLayout(vbox)
+
 #Qwidget
 class MainWindow(QMainWindow):
     def __init__(self,model,number,window):
@@ -145,19 +163,28 @@ class MainWindow(QMainWindow):
     def initUI(self):
         # 添加组件
         self.resize(1000,800)
-        self.setWindowIcon(QIcon("./avatar3.jpg"))  # 设置窗口图标
+        self.setWindowIcon(QIcon("./avatar.jpg"))  # 设置窗口图标
         #self.setWindowIcon(QIcon())  #设置窗口图标为空
         self.setWindowTitle(" ")
         #self.setWindowFlags(Qt.FramelessWindowHint)
         main_widget=QWidget()
         title_label = QLabel('人脸表情识别系统')
         title_label.setFont(QFont("Arial", 18, QFont.Bold))
+        profile=get_user_profile(self.number)
+        print(profile['avatar'])
+        print(profile['name'])
+        self.avatar=profile['avatar']
+        self.name=profile['name']
+
+
         face_recognition_btn = QPushButton('基于图片的表情识别')
         camera_recognition_btn = QPushButton('基于摄像头的表情识别')
         video_recognition_btn = QPushButton('基于视频的表情识别')
         usage_record_btn = QPushButton('查看使用记录')
         # 创建堆叠窗口和页面
         self.stacked_widget = QStackedWidget()
+        #主页面
+        self.homepage=Return_to_homepage(self.name)
         #四个功能界面
         self.face_recognition_page = Picture(self.model,self.number)
         #self.camera_recognition_page = Camera(self.model)
@@ -169,6 +196,7 @@ class MainWindow(QMainWindow):
         self.video_recognition_page=QWidget()
         self.usage_record_page = UsageRecord(self.number)
         #添加到堆叠窗口里
+        self.stacked_widget.addWidget(self.homepage)
         self.stacked_widget.addWidget(self.face_recognition_page)
         self.stacked_widget.addWidget(self.usage_record_page)
         #self.stacked_widget.addWidget(self.camera_recognition_page)
@@ -187,7 +215,8 @@ class MainWindow(QMainWindow):
         #用户下拉菜单
         self.button = QPushButton()
         self.button.setFixedSize(40, 40)
-        icon = QIcon("./avatar2.jpg")  # 替换为您自己的图标路径
+        icon=QIcon(self.avatar)
+        #icon = QIcon("C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg")  # 替换为您自己的图标路径
         pixmap = icon.pixmap(40, 40)  # 调整图标大小为 40x40 像素
         #self.button.setIcon(QIcon('./avatar2.jpg'))
         self.button.setIcon(QIcon(pixmap))
@@ -226,10 +255,10 @@ class MainWindow(QMainWindow):
         return_to_home=Return_to_home()
         # 创建布局管理器
 
-
+        #左上角返回主页标签 
         self.icon_label = QLabel(self)
 
-        self.icon_label.setPixmap(QPixmap("./avatar5.jpg"))  # 设置图标图片路径
+        self.icon_label.setPixmap(QPixmap("./avatar.jpg"))  # 设置图标图片路径
         self.icon_label.setFixedSize(50, 50)  # 设置图标大小
         self.icon_label.setAlignment(Qt.AlignCenter)  # 居中对齐
         self.icon_label.setScaledContents(True)  # 图片按比例缩放
@@ -281,11 +310,27 @@ class MainWindow(QMainWindow):
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
+
+    
     def return_to_login(self):
         self.close()
         self.window.show()
     def return_to_home(self, event):
         # 处理点击事件，这里是返回主页的操作
+        current_widget_index = self.stacked_widget.currentIndex()
+        #print(str(current_widget_index)+'ggg')  
+        widget_to_remove = self.stacked_widget.widget(current_widget_index)
+        widget_to_remove.setVisible(False)
+        #self.stacked_widget.currentWidget().setVisible(False)
+        #self.stacked_widget.removeWidget(widget_to_remove)  
+        #widget_to_remove.deleteLater()
+        #self.face_recognition_page = Picture(self.model,self.number)
+        if(self.stacked_widget.indexOf(self.homepage)==-1):   
+            self.stacked_widget.addWidget(self.homepage)
+        self.homepage.setVisible(True)
+        self.stacked_widget.setCurrentWidget(self.homepage)
+        #print(str(current_widget_index)+'aaaa')
+        current_widget_index = self.stacked_widget.currentIndex()
         print("返回主页")
     def switch_page(self,page_name):    #每当页面切换时，添加相机表情识别记录
         self.stacked_widget.blockSignals(True) 
