@@ -23,11 +23,13 @@ class Picture_table(QWidget):
         #self.datas=get_picture_usage_record(self.number)
 
         # Add page navigation buttons
-        self.prev_button = QPushButton('Prev')
+        #self.prev_button = QPushButton('Prev')
+        self.prev_button = QPushButton('上一页')
         self.prev_button.clicked.connect(self.prev_page)
-        self.next_button = QPushButton('Next')
+        #self.next_button = QPushButton('Next')
+        self.next_button = QPushButton('下一页')
         self.next_button.clicked.connect(self.next_page)
-        self.page_label = QLabel(f'Page {self.current_page+1}')
+        self.page_label = QLabel(f'第 {self.current_page+1} 页')
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.prev_button)
@@ -48,27 +50,29 @@ class Picture_table(QWidget):
             if(data_len%10==0):
                 min_len=10
             else :
-                min_len=data_len
+                min_len=data_len%10
             self.flag=True
         else :
             min_len=10
         #data = [[random.randint(0, 100) for _ in range(5)] for _ in range(self.page_size)]
         for row in range((self.current_page)*self.page_size,(self.current_page)*self.page_size+min_len):
-            self.table_widget.setItem(row, 0, QTableWidgetItem(self.datas[row]['picture_address']))
-            self.table_widget.setItem(row, 1, QTableWidgetItem(self.datas[row]['result']))
-            self.table_widget.setItem(row, 2, QTableWidgetItem(self.datas[row]['picturetime']))
+            #必须要row取模即row%page_size，否则切换下一页的时候会没有数据
+            self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(self.datas[row]['picture_address'])) 
+            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['result']))
+            self.table_widget.setItem(row%self.page_size, 2, QTableWidgetItem(self.datas[row]['picturetime']))
     
     def prev_page(self):
         if self.current_page > 0:
+            self.flag=False
             self.current_page -= 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
     def next_page(self):
         if self.flag==False:
             self.current_page += 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
 
 class Video_table(QWidget):
@@ -87,11 +91,13 @@ class Video_table(QWidget):
         self.table_widget.setHorizontalHeaderLabels(['使用时长', '使用时间'])
         self.update_table()
         # Add page navigation buttons
-        self.prev_button = QPushButton('Prev')
+        #self.prev_button = QPushButton('Prev')
+        self.prev_button = QPushButton('上一页')
         self.prev_button.clicked.connect(self.prev_page)
-        self.next_button = QPushButton('Next')
+        #self.next_button = QPushButton('Next')
+        self.next_button = QPushButton("下一页")
         self.next_button.clicked.connect(self.next_page)
-        self.page_label = QLabel(f'Page {self.current_page+1}')
+        self.page_label = QLabel(f'第 {self.current_page+1} 页')
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.prev_button)
@@ -113,26 +119,27 @@ class Video_table(QWidget):
             if(data_len%10==0):
                 min_len=10
             else :
-                min_len=data_len
+                min_len=data_len%10
             self.flag=True
         else :
             min_len=10
         #data = [[random.randint(0, 100) for _ in range(5)] for _ in range(self.page_size)]
         for row in range((self.current_page)*self.page_size,(self.current_page)*self.page_size+min_len):
-            self.table_widget.setItem(row, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
-            self.table_widget.setItem(row, 1, QTableWidgetItem(self.datas[row]['videotime']))
+            self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
+            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['videotime']))
     
     def prev_page(self):
         if self.current_page > 0:
+            self.flag=False
             self.current_page -= 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
     def next_page(self):
         if self.flag==False:
             self.current_page += 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
 
 class Camera_table(QWidget):
@@ -153,11 +160,13 @@ class Camera_table(QWidget):
         #self.datas=get_picture_usage_record(self.number)
 
         # Add page navigation buttons
-        self.prev_button = QPushButton('Prev')
+        #self.prev_button = QPushButton('Prev')
+        self.prev_button = QPushButton('上一页')
         self.prev_button.clicked.connect(self.prev_page)
-        self.next_button = QPushButton('Next')
+        # self.next_button = QPushButton('Next')
+        self.next_button = QPushButton('下一页')
         self.next_button.clicked.connect(self.next_page)
-        self.page_label = QLabel(f'Page {self.current_page+1}')
+        self.page_label = QLabel(f'第 {self.current_page+1} 页')
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.prev_button)
@@ -184,20 +193,21 @@ class Camera_table(QWidget):
             min_len=10
         #data = [[random.randint(0, 100) for _ in range(5)] for _ in range(self.page_size)]
         for row in range((self.current_page)*self.page_size,(self.current_page)*self.page_size+min_len):
-            self.table_widget.setItem(row, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
-            self.table_widget.setItem(row, 1, QTableWidgetItem(self.datas[row]['cameratime']))
+            self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
+            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['cameratime']))
     
     def prev_page(self):
         if self.current_page > 0:
+            self.flag=False
             self.current_page -= 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
     def next_page(self):
         if self.flag==False:
             self.current_page += 1
             self.update_table()
-            self.page_label.setText(f'Page {self.current_page+1}')
+            self.page_label.setText(f'第 {self.current_page+1} 页')
 
 
 
