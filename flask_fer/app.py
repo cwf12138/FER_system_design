@@ -101,7 +101,7 @@ class Modify_avatar(Resource):
             db.session.commit()
         except:
             db.session.rollback()
-        return {'msg':"Successfully modified the profile picture"}
+        return {'msg':"修改头像成功"}
         
 class Get_user_profile(Resource):
     def get(self,number):

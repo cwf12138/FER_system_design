@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QLineEdit,QFormLayout,QFrame
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QLineEdit,QFormLayout,QFrame,QFileDialog
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QSize
 import requests,json
@@ -19,25 +19,25 @@ class UserProfile(QWidget):
         right_layout = QVBoxLayout()
 
         # 左半部分布局
-        avatar_label = QLabel(self)     #头像
-        avatar_label.setFixedSize(300, 300)
-        avatar_label.setScaledContents(True)
-        avatar_label.setAlignment(Qt.AlignCenter)
-        avatar_label.setStyleSheet("""
+        self.avatar_label = QLabel(self)     #头像
+        self.avatar_label.setFixedSize(300, 300)
+        self.avatar_label.setScaledContents(True)
+        self.avatar_label.setAlignment(Qt.AlignCenter)
+        self.avatar_label.setStyleSheet("""
             border: 2px solid #ccc;
             border-radius: 50px;
         """)
-        avatar_label.mousePressEvent = self.change_avatar  
+        self.avatar_label.mousePressEvent = self.change_avatar  
         #头像地址
         avatar_image = QImage(self.avatar)   
         avatar_pixmap = QPixmap.fromImage(avatar_image)
-        avatar_label.setPixmap(avatar_pixmap)
+        self.avatar_label.setPixmap(avatar_pixmap)
         #头像下方的用户名
         self.username_label = QLabel(self.name, self)
         self.username_label.setAlignment(Qt.AlignCenter)
         self.username_label.setStyleSheet("font-size: 23px; font-weight: bold;")
 
-        left_layout.addWidget(avatar_label)
+        left_layout.addWidget(self.avatar_label)
         left_layout.addWidget(self.username_label)
         left_layout.addStretch()
 
@@ -107,6 +107,19 @@ class UserProfile(QWidget):
 
     def change_avatar(self, event):
         # 处理头像点击事件，实现头像更换逻辑
+        file_name, file_type = QFileDialog.getOpenFileName(caption="选取图片", directory="./input/test/",
+                                                                     filter="All Files (*);;Text Files (*.txt)")
+        if file_name is not None and file_name != "":
+            self.avatar=file_name
+            url="http://127.0.0.1:5000/modify_avatar/"
+            data={'number':self.number,'avatar':self.avatar}
+            response = requests.post(url,json=data)
+            datas=json.loads(response.content.decode('utf-8'))
+            avatar_image = QImage(self.avatar)   
+            avatar_pixmap = QPixmap.fromImage(avatar_image)
+            self.avatar_label.setPixmap(avatar_pixmap)
+
+
         print("Change Avatar")
     def modify_username(self):
         name=self.text_username.text()
@@ -124,8 +137,8 @@ class UserProfile(QWidget):
 if __name__ == "__main__":
     app = QApplication([])
     apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True)
-    name='gzu-cwf'
-    avatar='C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg'
+    name='cwf'
+    avatar='C:/Users/cwf/FacialExpressionRecognition/input/test/Pinterest_Download.jpg'
     number='18212139396'
     window = UserProfile(name,avatar,number)
     window.show()
