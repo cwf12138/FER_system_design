@@ -1,5 +1,5 @@
 import sys,cv2,time,requests,os
-from PyQt5.QtCore import Qt ,pyqtSlot,pyqtSignal
+from PyQt5.QtCore import Qt,pyqtSlot,pyqtSignal,QThread
 from PyQt5.QtGui import QPixmap,QIcon,QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtWidgets import  QLineEdit, QTextEdit, QStackedWidget, QTabWidget,QMainWindow,QFrame,QMenu,QAction
@@ -35,28 +35,10 @@ class UsageRecord(QWidget):
         
 
 
-class FaceRecognition(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
 
-    def initUI(self):
-        # 添加组件
-        img_label = QLabel('显示图片区域')
-        result_label = QLabel('显示识别结果区域')
-        bar_label = QLabel('显示柱状图区域')
-
-        # 创建布局管理器
-        vbox = QVBoxLayout()
-        vbox.addWidget(img_label)
-        vbox.addWidget(result_label)
-        vbox.addWidget(bar_label)
-
-        # 设置布局管理器
-        self.setLayout(vbox)
 
 #Qwidget
-class CameraRecognition(Camera):
+class CameraRecognition(Camera):   #这部分暂时没有用
     def __init__(self,model):
         super().__init__(self,model)
         self.model=model
@@ -94,7 +76,7 @@ class CameraRecognition(Camera):
         #self.setLayout(hbox)
 
 
-class VideoRecognition(QWidget):
+class VideoRecognition(QWidget):  #这部分也暂时没有用
     def __init__(self,model):
         super().__init__()
         self.model=model
@@ -133,7 +115,10 @@ class VideoRecognition(QWidget):
         # 设置布局管理器
         self.setLayout(hbox)
 
-class Return_to_homepage(QWidget):
+
+
+
+class Return_to_homepage(QWidget):  #主页，欢迎页，但感觉有一点单调了
     def __init__(self,name):
         super().__init__()
         self.name=name
@@ -151,6 +136,25 @@ class Return_to_homepage(QWidget):
         vbox.addWidget(label)
         self.setLayout(vbox)
 
+class AvatarThread(QThread):
+    resultChanged = pyqtSignal(bool)
+
+    def __init__(self, param1, param2, parent=None):
+        super().__init__(parent)
+        self.param1 = param1
+        self.param2 = param2
+
+    def run(self):
+        while True:
+            # 在这里实时判断参数是否相等
+            if self.param1 != self.param2:
+                self.resultChanged.emit(False)
+            else:
+                self.resultChanged.emit(True)
+            self.sleep(1)  # 休眠一秒钟再进行下一次判断
+
+
+
 #Qwidget
 class MainWindow(QMainWindow):
     def __init__(self,model,number,window):
@@ -160,6 +164,8 @@ class MainWindow(QMainWindow):
         self.number=number
         self.window=window
         self.initUI()
+        
+
 
     def initUI(self):
         # 添加组件
@@ -191,6 +197,7 @@ class MainWindow(QMainWindow):
         self.face_recognition_page = Picture(self.model,self.number)
         #个人资料界面
         self.userprofile_page=UserProfile(self.name,self.avatar,self.number)
+        self.userprofile_page.avatar_changed.connect(self.handle_property_changed)
         #self.camera_recognition_page = Camera(self.model)
         #摄像头表情识别
         self.camera_recognition_page=QWidget()
@@ -321,8 +328,18 @@ class MainWindow(QMainWindow):
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
-
     
+    def handle_property_changed(self, new_value):
+        # 执行属性变化后的操作
+        self.avatar=new_value
+        icon=QIcon(self.avatar)
+        #icon = QIcon("C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg")  # 替换为您自己的图标路径
+        pixmap = icon.pixmap(40, 40)  # 调整图标大小为 40x40 像素
+        #self.button.setIcon(QIcon('./avatar2.jpg'))
+        self.button.setIcon(QIcon(pixmap))
+        self.button.setIconSize(self.button.size())
+
+        print("Property changed:", new_value)
     def return_to_login(self):
         self.close()
         self.window.show()
@@ -339,9 +356,10 @@ class MainWindow(QMainWindow):
             self.stacked_widget.addWidget(self.userprofile_page)
         self.userprofile_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.userprofile_page)
+        self.avatar=self.userprofile_page.avatar
         #print(str(current_widget_index)+'aaaa')
         #current_widget_index = self.stacked_widget.currentIndex()
-        print('xx')
+        #print('xx')
     def return_to_home(self, event):
         # 处理点击事件，这里是返回主页的操作
         current_widget_index = self.stacked_widget.currentIndex()
@@ -492,3 +510,6 @@ if __name__ == '__main__':
     # windowLogin.show()
     sys.exit(app.exec_())
   
+
+
+

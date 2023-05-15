@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,QLineEdit,QFormLayout,QFrame,QFileDialog
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
 import requests,json
 from qt_material import apply_stylesheet
 class UserProfile(QWidget):
+    avatar_changed = pyqtSignal(str)
     def __init__(self,name,avatar,number):
         super().__init__()
         self.name=name
@@ -107,13 +109,17 @@ class UserProfile(QWidget):
         main_layout.addLayout(right_layout)
 
         self.setLayout(main_layout)
-
+    def update_avatar(self, new_value):
+        if self.avatar != new_value:
+            self.avatar = new_value
+            self.avatar_changed.emit(self.avatar)
     def change_avatar(self, event):
         # 处理头像点击事件，实现头像更换逻辑
         file_name, file_type = QFileDialog.getOpenFileName(caption="选取图片", directory="./input/test/",
                                                                      filter="All Files (*);;Text Files (*.txt)")
         if file_name is not None and file_name != "":
-            self.avatar=file_name
+            #self.avatar=file_name
+            self.update_avatar(file_name)
             url="http://127.0.0.1:5000/modify_avatar/"
             data={'number':self.number,'avatar':self.avatar}
             response = requests.post(url,json=data)

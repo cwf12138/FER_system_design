@@ -5,7 +5,7 @@ from datetime import date,datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 import matplotlib
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QImage, QPixmap,QFont
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHBoxLayout, QVBoxLayout, QPushButton, QWidget,QFrame,QSizePolicy,QStackedLayout,QGraphicsView
 from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize,QCoreApplication,QRect
 from matplotlib.figure import Figure
@@ -35,6 +35,7 @@ class Picture(QWidget):
         self.label_raw_pic = QLabel("NULL")
         #self.label_raw_pic.setGeometry(QRect(10, 30, 320, 240))
         self.label_raw_pic.setStyleSheet("background-color:#bbbbbb;")
+        self.label_raw_pic.setFixedSize(320, 240)
         self.label_raw_pic.setAlignment(Qt.AlignCenter)      #居中
         #self.label_raw_pic.setObjectName("label_raw_pic")
         # 原图下方分割线
@@ -45,7 +46,10 @@ class Picture(QWidget):
         #self.line1.setObjectName("line1")
         # 作者说明label
         self.label_designer = QLabel('no')
+
         #self.label_designer.setGeometry(QtCore.QRect(20, 700, 180, 40))
+        self.label_designer.setStyleSheet("font-size: 20px;") #修改字体样式
+        #self.label_designer.setFont(QFont("Arial", 18, QFont.Bold))   
         font = QtGui.QFont()
         font.setPointSize(10)
         #self.label_designer.setFont(font)
@@ -74,6 +78,7 @@ class Picture(QWidget):
         #self.label_result.setGeometry(QRect(361, 21, 71, 16))
         #self.label_result.setObjectName("label_result")
         self.label_emotion = QLabel()
+        self.label_emotion.setStyleSheet("font-size: 20px;") #修改字体样式
         #self.label_emotion.setGeometry(QRect(715, 21, 71, 16))
         #self.label_emotion.setObjectName("label_emotion")
         self.label_emotion.setAlignment(Qt.AlignCenter)
@@ -99,6 +104,7 @@ class Picture(QWidget):
         self.vbox_left.addWidget(self.line2)
         self.vbox_left.addWidget(self.pushButton_select_img)
         self.vbox_left.addWidget(self.line2)
+        self.vbox_left.addStretch()   #可以将self.label_designer 移动到左下角
         self.vbox_left.addWidget(self.label_designer)
         #self.vbox_left.addWidget(self.line2)
         self.horizontal_layout.addLayout(self.vbox_left)
@@ -154,7 +160,7 @@ class Picture(QWidget):
 
     def show_raw_img(self, filename):   #这个部分就是显示图片并更改了大小   #?这个部分是值得参考的，hh
         img = cv2.imread(filename)
-        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小
+        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小  320 240
         self.label_raw_pic.setPixmap(QtGui.QPixmap.fromImage(
                     QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))  
                                         #这里相当于就是显示图片

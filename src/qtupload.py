@@ -41,6 +41,6 @@ class Videoupload(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     model=load_model()
-    window = MainWindow(model)
-    window.show()
+    video = Videoupload(model)
+    video.show()
     sys.exit(app.exec_())
