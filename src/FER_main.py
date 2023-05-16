@@ -38,86 +38,6 @@ class UsageRecord(QWidget):
 
 
 #Qwidget
-class CameraRecognition(Camera):   #这部分暂时没有用
-    def __init__(self,model):
-        super().__init__(self,model)
-        self.model=model
-        self.initUI()
-
-    def initUI(self):
-        # 添加组件
-        camera_label = QLabel('显示摄像头获取的图像区域')
-        #camera_widget=Camera(self.model)
-        #camera_box=camera_widget.vbox
-        bar_label = QLabel('显示柱状图区域')
-        desc_label = QLabel('显示说明区域')
-        separator_line_v = QFrame()
-        separator_line_v.setFrameShape(QFrame.VLine)
-        separator_line_v.setFrameShadow(QFrame.Sunken)
-        separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
-        separator_line_h.setFrameShape(QFrame.HLine)
-        separator_line_h.setFrameShadow(QFrame.Sunken)
-        #qbtn=QPushButton("push it")
-        # 创建布局管理器
-        hbox = QHBoxLayout()
-        vbox_left = QVBoxLayout()
-        vbox_left.addWidget(camera_label)
-        #vbox_left.addWidget(qbtn)
-        hbox.addLayout(vbox_left)
-        hbox.addWidget(separator_line_v)
-
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(bar_label)
-        vbox_right.addWidget(separator_line_h)
-        vbox_right.addWidget(desc_label)
-        hbox.addLayout(vbox_right)
-
-        # 设置布局管理器
-        #self.setLayout(hbox)
-
-
-class VideoRecognition(QWidget):  #这部分也暂时没有用
-    def __init__(self,model):
-        super().__init__()
-        self.model=model
-        self.initUI()
-
-    def initUI(self):
-        # 添加组件
-        video_label = QLabel('显示视频区域')
-        bar_label = QLabel('显示柱状图区域')
-        desc_label = QLabel('显示说明区域')
-        separator_line = QFrame()
-        separator_line.setFrameShape(QFrame.VLine)
-        separator_line.setFrameShadow(QFrame.Sunken)
-        separator_line_h = QFrame()
-        #separator_line_h.setLineWidth(3)
-        #separator_line_h.setMidLineWidth(3) 
-        separator_line_h.setFrameShape(QFrame.HLine)
-        separator_line_h.setFrameShadow(QFrame.Plain)
-
-        # 创建布局管理器
-        hbox = QHBoxLayout()
-        vbox_left = QVBoxLayout()
-        vbox_left.addWidget(video_label)
-        #vbox_left.addWidget(separator_line)
-        hbox.addLayout(vbox_left)
-        hbox.addWidget(separator_line)
-
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(desc_label)
-        vbox_right.addWidget(separator_line_h)
-        vbox_right.addWidget(bar_label)
-        hbox.addLayout(vbox_right)
-        cam=Camera(self.model)
-        hbox.addWidget(cam)
-
-        # 设置布局管理器
-        self.setLayout(hbox)
-
-
-
-
 class Return_to_homepage(QWidget):  #主页，欢迎页，但感觉有一点单调了
     def __init__(self,name):
         super().__init__()
@@ -127,13 +47,13 @@ class Return_to_homepage(QWidget):  #主页，欢迎页，但感觉有一点单�
         welcome_label=QLabel("欢迎使用人脸表情识别系统")
         welcome_label.setAlignment(Qt.AlignCenter)
         welcome_label.setStyleSheet("font-size: 18px; font-weight: bold;")
-        label = QLabel(f"尊敬的{self.name}用户!",self)
+        self.label = QLabel(f"尊敬的{self.name}用户!",self)
         #label.setGeometry(100, 80, 200, 40)
-        label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("font-size: 18px; font-weight: bold;")
         vbox=QVBoxLayout()
         vbox.addWidget(welcome_label)
-        vbox.addWidget(label)
+        vbox.addWidget(self.label)
         self.setLayout(vbox)
 
 class AvatarThread(QThread):
@@ -197,7 +117,8 @@ class MainWindow(QMainWindow):
         self.face_recognition_page = Picture(self.model,self.number)
         #个人资料界面
         self.userprofile_page=UserProfile(self.name,self.avatar,self.number)
-        self.userprofile_page.avatar_changed.connect(self.handle_property_changed)
+        self.userprofile_page.avatar_changed.connect(self.handle_property_changed)  #实时监测其他页面中的属性变化
+        self.userprofile_page.name_changed.connect(self.changed_name)
         #self.camera_recognition_page = Camera(self.model)
         #摄像头表情识别
         self.camera_recognition_page=QWidget()
@@ -328,7 +249,14 @@ class MainWindow(QMainWindow):
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
         #video_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(video_recognition_page))
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
-    
+
+    #信号槽机制   -----实时监测其他页面中的属性变化  
+    def changed_name(self,new_value):
+        self.name=new_value
+        self.homepage.label.setText(f"尊敬的{self.name}用户!")
+        print(new_value)
+        #self.label = QLabel(f"尊敬的{self.name}用户!",self)
+        
     def handle_property_changed(self, new_value):
         # 执行属性变化后的操作
         self.avatar=new_value
