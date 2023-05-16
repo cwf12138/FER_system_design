@@ -151,10 +151,10 @@ class MainWindow(QMainWindow):
 
         #用户下拉菜单
         self.button = QPushButton()
-        self.button.setFixedSize(40, 40)
+        self.button.setFixedSize(50, 50) #40*40
         icon=QIcon(self.avatar)
         #icon = QIcon("C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg")  # 替换为您自己的图标路径
-        pixmap = icon.pixmap(40, 40)  # 调整图标大小为 40x40 像素
+        pixmap = icon.pixmap(50, 50)  # 调整图标大小为 40x40 像素
         #self.button.setIcon(QIcon('./avatar2.jpg'))
         self.button.setIcon(QIcon(pixmap))
         self.button.setIconSize(self.button.size())
@@ -167,7 +167,7 @@ class MainWindow(QMainWindow):
         # 创建一个下拉菜单
         self.menu = QMenu(self)
         self.menu.setStyleSheet("QMenu {background-color: white; border: 1px solid gray;}")
-        self.menu.setFixedWidth(200)
+        self.menu.setFixedWidth(170) #200 
 
         # 添加菜单项
         #self.menu.addAction('你的个人资料')
@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
 
 
         #用户下拉菜单
-        drop_down_menu=UserDropDown()
+        #drop_down_menu=UserDropDown()
         #返回主页面
         return_to_home=Return_to_home()
         # 创建布局管理器
@@ -203,8 +203,8 @@ class MainWindow(QMainWindow):
         self.icon_label.setScaledContents(True)  # 图片按比例缩放
         # 设置标签位置和点击事件
         self.icon_label.move(10, 10)  # 设置图标位置
-        self.icon_label.mousePressEvent = self.return_to_home  # 绑定点击事件
-
+        self.icon_label.mousePressEvent = self.return_to_home  # 绑定点击事件  返回主页
+        #导航栏部分
         nav_layout = QHBoxLayout()
         #nav_layout.addWidget(return_to_home)
         nav_layout.addWidget(self.icon_label)
@@ -212,11 +212,10 @@ class MainWindow(QMainWindow):
         nav_layout.addWidget(camera_recognition_btn)
         nav_layout.addWidget(video_recognition_btn)
         nav_layout.addWidget(usage_record_btn)
-        #nav_layout.addWidget(drop_down_menu)
         nav_layout.addWidget(self.button)
         #nav_layout.addWidget(tab_widget)
         main_layout = QVBoxLayout()
-        main_layout.addWidget(title_label, alignment=Qt.AlignCenter)
+        main_layout.addWidget(title_label, alignment=Qt.AlignCenter)  #系统名，标题标签
         main_layout.addLayout(nav_layout)
         #分割线
         separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
@@ -232,18 +231,20 @@ class MainWindow(QMainWindow):
         # 设置布局管理器
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+        #添加每一个按钮的点击事件
         face_recognition_btn.clicked.connect(self.add_and_show_picture)
         camera_recognition_btn.clicked.connect(self.add_and_show_camera)
         video_recognition_btn.clicked.connect(self.add_and_show_video_uplaoad)
         usage_record_btn.clicked.connect(self.add_and_show_record)
 
-        self.stacked_widget.currentChanged.connect(self.switch_page)  #检测页面切换
+        self.stacked_widget.currentChanged.connect(self.switch_page)  #检测页面切换，主要是为了测摄像头表情识别的时间
         self.stacked_widget.blockSignals(True)   #信号锁
         qbtn=QPushButton('进行人脸表情识别')
         #self.video_recognition_page_load = Videoupload(self.model)
         self.video_recognition_page_load.vbox.addWidget(qbtn)
         qbtn.clicked.connect(self.add_and_show_video_run)
-        qbtn.clicked.connect(self.switch_video_run)
+        qbtn.clicked.connect(self.switch_video_run)  #检测视频表情识别的时间
+
         # 信号槽连接
         #face_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(face_recognition_page))
         #camera_recognition_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(camera_recognition_page))
@@ -251,27 +252,27 @@ class MainWindow(QMainWindow):
         #usage_record_btn.clicked.connect(lambda: stacked_widget.setCurrentWidget(usage_record_page))
 
     #信号槽机制   -----实时监测其他页面中的属性变化  
-    def changed_name(self,new_value):
+    def changed_name(self,new_value):  
         self.name=new_value
         self.homepage.label.setText(f"尊敬的{self.name}用户!")
-        print(new_value)
+        #print(new_value)
         #self.label = QLabel(f"尊敬的{self.name}用户!",self)
         
-    def handle_property_changed(self, new_value):
+    def handle_property_changed(self, new_value):  #修改头像
         # 执行属性变化后的操作
         self.avatar=new_value
         icon=QIcon(self.avatar)
         #icon = QIcon("C:/Users/cwf/FacialExpressionRecognition/avatar2.jpg")  # 替换为您自己的图标路径
-        pixmap = icon.pixmap(40, 40)  # 调整图标大小为 40x40 像素
+        pixmap = icon.pixmap(50, 50)  # 调整图标大小为 40x40 像素
         #self.button.setIcon(QIcon('./avatar2.jpg'))
         self.button.setIcon(QIcon(pixmap))
         self.button.setIconSize(self.button.size())
 
-        print("Property changed:", new_value)
-    def return_to_login(self):
+        #print("Property changed:", new_value)
+    def return_to_login(self):   #退出重新登录
         self.close()
         self.window.show()
-    def open_userprofile(self):
+    def open_userprofile(self):   #打开个人主页
         current_widget_index = self.stacked_widget.currentIndex()
         #print(str(current_widget_index)+'ggg')  
         widget_to_remove = self.stacked_widget.widget(current_widget_index)
@@ -287,8 +288,8 @@ class MainWindow(QMainWindow):
         self.avatar=self.userprofile_page.avatar
         #print(str(current_widget_index)+'aaaa')
         #current_widget_index = self.stacked_widget.currentIndex()
-        #print('xx')
-    def return_to_home(self, event):
+        
+    def return_to_home(self, event):    #返回主页
         # 处理点击事件，这里是返回主页的操作
         current_widget_index = self.stacked_widget.currentIndex()
         #print(str(current_widget_index)+'ggg')  
@@ -304,7 +305,7 @@ class MainWindow(QMainWindow):
         self.stacked_widget.setCurrentWidget(self.homepage)
         #print(str(current_widget_index)+'aaaa')
         current_widget_index = self.stacked_widget.currentIndex()
-        print("返回主页")
+        #print("返回主页")
     def switch_page(self,page_name):    #每当页面切换时，添加相机表情识别记录
         self.stacked_widget.blockSignals(True) 
         #current=self.stacked_widget.currentIndex()
@@ -336,7 +337,7 @@ class MainWindow(QMainWindow):
         self.camera_recognition_page.setVisible(True)
         self.stacked_widget.setCurrentWidget(self.camera_recognition_page)
         self.stacked_widget.blockSignals(False)  #信号锁
-        current_widget_index = self.stacked_widget.currentIndex()
+        #current_widget_index = self.stacked_widget.currentIndex()
         
     #图片
     def add_and_show_picture(self):
@@ -381,7 +382,18 @@ class MainWindow(QMainWindow):
         if(self.stacked_widget.indexOf(self.video_recognition_page)==-1):
             self.video_recognition_page = Camera(self.model,self.filename)
             qbtn=QPushButton('返回重新上传')
-            self.video_recognition_page.hbox.addWidget(qbtn)
+            separator_line_h2 = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
+            separator_line_h2.setFrameShape(QFrame.HLine)
+            separator_line_h2.setFrameShadow(QFrame.Sunken)
+            
+            self.video_recognition_page.vbox_right.addWidget(qbtn)
+            label_space1=QLabel(" ")
+            #下面这两步主要是为了是qbtn和左边的视频按钮对齐
+            self.video_recognition_page.vbox_right.addWidget(separator_line_h2)
+            self.video_recognition_page.vbox_right.addWidget(label_space1)
+            
+            #self.video_recognition_page.vbox_right.addWidget(label_space2)
+            #self.video_recognition_page.vbox_right.addStretch()
             qbtn.clicked.connect(self.add_and_show_video_uplaoad)
             qbtn.clicked.connect(self.switch_video_upload)   
             self.stacked_widget.addWidget(self.video_recognition_page)

@@ -19,11 +19,11 @@ class Videoupload(QWidget):
         # 创建控件
         self.button_upload = QPushButton('上传视频')
         self.label_path = QLabel("")
-        self.button_video=QPushButton('人脸检测')
+        #self.button_video=QPushButton('人脸检测')
         # 设置布局
         self.vbox = QVBoxLayout()
         self.vbox.addWidget(self.button_upload)
-        self.vbox.addWidget(self.button_video)
+        #self.vbox.addWidget(self.button_video)
         self.vbox.addWidget(self.label_path)
         self.setLayout(self.vbox)
 

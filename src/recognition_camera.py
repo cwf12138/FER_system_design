@@ -92,7 +92,9 @@ class Camera(QWidget):
         self.emotion=[]
         self.result_possibility=[1,2,4,6,1,4,2,2]
         self.label_img=QLabel('img')
+        self.label_img.setAlignment(Qt.AlignCenter)
         self.label_emotion=QLabel('emotion')
+        self.label_emotion.setAlignment(Qt.AlignCenter)
         self.label_chart=QLabel('chart')
         self.setObjectName=("FER")
         #self.video_capture = video_capture
@@ -108,8 +110,10 @@ class Camera(QWidget):
         self.timer.timeout.connect(lambda:self.show_emotion(self.emotion))
         #lambda:child_window.show()
         self.show_emotion(self.emotion)
+
         # 创建一个标签用于显示视频流
         self.label_video = QLabel(self)
+        self.label_video.setMaximumSize(700, 520)  #暂定这个尺寸       限制显示的大小  600 480
         self.label_video.setAlignment(Qt.AlignCenter)
         bar_label = QLabel('显示柱状图区域')
         desc_label = QLabel('显示说明区域')
@@ -119,6 +123,7 @@ class Camera(QWidget):
         separator_line_h = QFrame()   #separator_line_h.setLineWidth(3)#separator_line_h.setMidLineWidth(3) 增加宽度
         separator_line_h.setFrameShape(QFrame.HLine)
         separator_line_h.setFrameShadow(QFrame.Sunken)
+        
         # 创建一个按钮用于开始/暂停视频流的播放
         self.btn_play_pause = QPushButton("Play", self)
         self.btn_play_pause.clicked.connect(self.play_pause_video)
@@ -134,7 +139,7 @@ class Camera(QWidget):
         vbox = QVBoxLayout()
         vbox.addWidget(self.label_video)
         vbox.addLayout(hbox)
-        vbox.addStretch()
+        #vbox.addStretch()   #?这一个布局是关键
 
         # 将垂直布局应用于主窗口
         #self.vbox=vbox
@@ -144,10 +149,17 @@ class Camera(QWidget):
         self.hbox.addLayout(vbox)
         self.hbox.addWidget(separator_line_v)
 
-        vbox_right = QVBoxLayout()
-        vbox_right.addWidget(self.label_emotion)
-        vbox_right.addWidget(self.label_img)
-        vbox_right.addWidget(separator_line_h)
+        self.label_space1=QLabel(" ")
+        self.label_space2=QLabel(" ")
+        self.label_space3=QLabel(" ")
+        self.vbox_right = QVBoxLayout()
+        self.vbox_right.addWidget(self.label_space1)
+        self.vbox_right.addWidget(self.label_space2)
+        #vbox_right.addWidget(self.label_space3)
+        self.vbox_right.addWidget(self.label_emotion)
+        self.vbox_right.addWidget(self.label_img)
+        self.vbox_right.addWidget(separator_line_h)
+        
         #self.stackedLayout = QStackedLayout()
         #print(self.result_possibility)
         #生成柱状图表
@@ -155,11 +167,13 @@ class Camera(QWidget):
         #self.barchart=barchart
         #self.vbox_right.addWidget(self.barchart)
         #self.label_chart.setLayout(self.vbox_right)
-        vbox_right.addStretch()
-        self.hbox.addLayout(vbox_right)
+
+
+        self.vbox_right.addStretch()
+        self.hbox.addLayout(self.vbox_right)
         #hbox.addWidget(self.label_chart)
         self.setLayout(self.hbox)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  #这一部分
 
 
         # 打开视频流
