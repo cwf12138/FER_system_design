@@ -1,10 +1,36 @@
-from PyQt5.QtWidgets import QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QHBoxLayout, QPushButton,QLabel,QSizePolicy
+from PyQt5.QtWidgets import QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QHBoxLayout, QPushButton,QLabel,QSizePolicy, QDialog
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 import random,sys,os
 from qt_material import apply_stylesheet
 sys.path.append('../')
-#from getdata import get_camera_usage_record,get_picture_usage_record,get_video_usage_record
 from  getdata import get_camera_usage_record,get_picture_usage_record,get_video_usage_record
+class ImageDialog(QDialog):
+    def __init__(self, image_path):
+        super().__init__()
+
+        self.setWindowTitle("Image Viewer")
+        layout = QVBoxLayout(self)
+
+        label = QLabel(self)
+        pixmap = QPixmap(image_path).scaled(400, 400) 
+        label.setPixmap(pixmap)
+        label.setFixedSize(pixmap.size())  # 设置固定大小
+        label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)  # 设置大小策略
+        layout.addWidget(label)
+
+class TableWidget(QTableWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cellClicked.connect(self.showImage)
+
+    def showImage(self, row, column):
+        if column == 0:
+            item = self.item(row, column)
+            image_path = item.text()
+            dialog = ImageDialog(image_path)
+            dialog.exec()
+
 class Picture_table(QWidget):
     def __init__(self,datas):
         super().__init__()
@@ -16,7 +42,7 @@ class Picture_table(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.table_widget = QTableWidget()
+        self.table_widget = TableWidget()
         self.table_widget.setColumnCount(3)
         self.table_widget.setHorizontalHeaderLabels(['图片地址', '识别结果', '识别时间'])
         self.update_table()
@@ -59,7 +85,9 @@ class Picture_table(QWidget):
             #必须要row取模即row%page_size，否则切换下一页的时候会没有数据
             self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(self.datas[row]['picture_address'])) 
             self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['result']))
-            self.table_widget.setItem(row%self.page_size, 2, QTableWidgetItem(self.datas[row]['picturetime']))
+            picturetime=self.datas[row]['picturetime']
+            picturetime=picturetime.replace('"','')
+            self.table_widget.setItem(row%self.page_size, 2, QTableWidgetItem(picturetime))
     
     def prev_page(self):
         if self.current_page > 0:
@@ -126,7 +154,9 @@ class Video_table(QWidget):
         #data = [[random.randint(0, 100) for _ in range(5)] for _ in range(self.page_size)]
         for row in range((self.current_page)*self.page_size,(self.current_page)*self.page_size+min_len):
             self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
-            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['videotime']))
+            videotime=self.datas[row]['videotime']
+            videotime=videotime.replace('"','')
+            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(videotime))
     
     def prev_page(self):
         if self.current_page > 0:
@@ -140,6 +170,8 @@ class Video_table(QWidget):
             self.current_page += 1
             self.update_table()
             self.page_label.setText(f'第 {self.current_page+1} 页')
+
+
 
 
 class Camera_table(QWidget):
@@ -194,7 +226,9 @@ class Camera_table(QWidget):
         #data = [[random.randint(0, 100) for _ in range(5)] for _ in range(self.page_size)]
         for row in range((self.current_page)*self.page_size,(self.current_page)*self.page_size+min_len):
             self.table_widget.setItem(row%self.page_size, 0, QTableWidgetItem(str(self.datas[row]['usagetime'])+'s'))
-            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(self.datas[row]['cameratime']))
+            cameratime=self.datas[row]['cameratime']
+            cameratime=cameratime.replace('"','')
+            self.table_widget.setItem(row%self.page_size, 1, QTableWidgetItem(cameratime))
     
     def prev_page(self):
         if self.current_page > 0:
