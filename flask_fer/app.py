@@ -38,6 +38,7 @@ class Login(Resource):
                 return {'msg':'登录成功','flag':'1'}
              else :
                 return {'msg':'密码不正确','flag':'0'}
+api.add_resource(Login,'/login/')
 
 class Register(Resource):
     def post(self):
@@ -114,7 +115,7 @@ class Get_user_profile(Resource):
 
 
 
-class Picture_usage_record_get(Resource):
+class Picture_usage_record_get(Resource):  #获取图片人脸表情识别使用记录
     def get(self,number):
         user=User.query.filter(User.number==number).first()
         picture_records=Picture_FER_Usage_Record.query.filter(Picture_FER_Usage_Record.uid==user.uid).all()
@@ -127,6 +128,8 @@ class Picture_usage_record_get(Resource):
             picturetime=json.dumps(record.picturetime,default=str)
             datas.append({'pid':pid,'name':name,'picture_address':picture_address,'result':result,'picturetime':picturetime})
         return {'datas':datas,'lens':len(datas)}
+
+api.add_resource(Picture_usage_record_get,'/get_picture_record/<string:number>')
 
 class Video_usage_record_get(Resource):
     def get(self,number):
@@ -152,8 +155,8 @@ class Camera_usage_record_get(Resource):
             datas.append({'cid':cid,'usagetime':usagetime,'cameratime':cameratime})
         return {'datas':datas,'lens':len(datas)}
     
-    #添加图片表情识别操作记录  ok
-class Picture_usage_record_add(Resource): 
+    
+class Picture_usage_record_add(Resource): #添加图片表情识别操作记录  
     def post(self):
         number=request.json['number']
         uid=User.query.filter(User.number==number).first().uid
@@ -169,6 +172,8 @@ class Picture_usage_record_add(Resource):
             print("no")
             db.session.rollback()
         return {'msg':"Added successfully"}
+api.add_resource(Picture_usage_record_add,'/add_picture_record/')
+
     #基于上传视频的人脸表情识别 记录添加 ok
 class Video_usage_record_add(Resource):
     def post(self):
@@ -222,14 +227,14 @@ def token_required(f):
 
 
 api.add_resource(Get_user_profile,'/get_user_profile/<string:number>')
-api.add_resource(Picture_usage_record_get,'/get_picture_record/<string:number>')
+
 api.add_resource(Video_usage_record_get,'/get_video_record/<string:number>')
 api.add_resource(Camera_usage_record_get,'/get_camera_record/<string:number>')
-api.add_resource(Picture_usage_record_add,'/add_picture_record/')
+
 api.add_resource(Video_usage_record_add,'/add_video_record/')
 api.add_resource(Camera_usage_record_add,'/add_camera_record/')
 api.add_resource(Modify_avatar,'/modify_avatar/')
-api.add_resource(Login,'/login/')
+
 api.add_resource(Modify_name,'/modify_name/')
 api.add_resource(Register,'/register/')
 api.add_resource(Modify_password,'/modify_password/')

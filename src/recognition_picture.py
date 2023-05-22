@@ -38,6 +38,13 @@ class Picture(QWidget):
         self.label_raw_pic.setFixedSize(320, 240)
         self.label_raw_pic.setAlignment(Qt.AlignCenter)      #居中
         #self.label_raw_pic.setObjectName("label_raw_pic")
+        # 结果图无图时显示的label      #懂了，就是左下部分那个深灰色小方框
+        self.label_result_pic = QLabel("NULL")
+        #self.label_raw_pic.setGeometry(QRect(10, 30, 320, 240))
+        self.label_result_pic.setStyleSheet("background-color:#bbbbbb;")
+        self.label_result_pic.setFixedSize(320, 240)
+        self.label_result_pic.setAlignment(Qt.AlignCenter)      #居中
+
         # 原图下方分割线
         self.line1 = QFrame()
         #self.line1.setGeometry(QtCore.QRect(340, 30, 20, 431))
@@ -104,6 +111,7 @@ class Picture(QWidget):
         self.vbox_left.addWidget(self.line2)
         self.vbox_left.addWidget(self.pushButton_select_img)
         self.vbox_left.addWidget(self.line2)
+        self.vbox_left.addWidget(self.label_result_pic)   #结果图
         self.vbox_left.addStretch()   #可以将self.label_designer 移动到左下角
         self.vbox_left.addWidget(self.label_designer)
         #self.vbox_left.addWidget(self.line2)
@@ -122,6 +130,7 @@ class Picture(QWidget):
 
     def retranslate_ui(self):
         self.label_raw_pic.setText("O(∩_∩)O")
+        self.label_result_pic.setText("^-^")
         self.label_designer.setText("designed by gzu-cwf")
         self.pushButton_select_img.setText("选择图像")
         self.label_result.setText("识别结果")
@@ -146,6 +155,8 @@ class Picture(QWidget):
             self.show_raw_img(file_name)  
             emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
            # print(emotion)  这里已经是英文了
+            file_name_result='./output/rst.png'
+            self.show_result_img(file_name_result)
             self.emotion=emotion
             self.possibility=possibility
             #self.barchar=BarChart(xemotions,self.possibility)
@@ -164,7 +175,12 @@ class Picture(QWidget):
         self.label_raw_pic.setPixmap(QtGui.QPixmap.fromImage(
                     QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))  
                                         #这里相当于就是显示图片
-
+    def show_result_img(self, filename):   #这个部分就是显示图片并更改了大小  结果图
+        img = cv2.imread(filename)
+        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小  320 240
+        self.label_result_pic.setPixmap(QtGui.QPixmap.fromImage(
+                    QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))    #这里相当于就是显示图片
+    
     def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         #print(emotion)

@@ -19,12 +19,12 @@ class ImageDialog(QDialog):
         label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)  # 设置大小策略
         layout.addWidget(label)
 
-class TableWidget(QTableWidget):
+class TableWidget(QTableWidget):      
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.cellClicked.connect(self.showImage)
+        self.cellClicked.connect(self.showImage)  #点击table中的图片地址就可以实现图片展示
 
-    def showImage(self, row, column):
+    def showImage(self, row, column):     #很好用
         if column == 0:
             item = self.item(row, column)
             image_path = item.text()

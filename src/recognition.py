@@ -61,32 +61,26 @@ def generate_faces(face_img, img_size=48):
     resized_images = np.array(resized_images)
     return resized_images
 
-
-def predict_expression(img_path, model):    #这个部分是最重要的，这里体现了数据的来源
     """
     对图中n个人脸进行表情预测
     :param img_path:
     :return:
     """
-
-    border_color = (0, 0, 0)  # 黑框框
-    font_color = (255, 255, 255)  # 白字字
-
+def predict_expression(img_path, model):    #这个部分是最重要的，这里体现了数据的来源
+    border_color = (0, 0, 0)  # 黑框
+    font_color = (255, 255, 255)  # 白字
     img, img_gray, faces = face_detect(img_path, 'blazeface')
     if len(faces) == 0:
         return 'no', [0, 0, 0, 0, 0, 0, 0, 0]
-    # 遍历每一个脸
-    emotions = []
+    emotions = []   # 遍历每一个脸
     result_possibilities = []
     for (x, y, w, h) in faces:
         face_img_gray = img_gray[y:y + h + 10, x:x + w + 10]
-        faces_img_gray = generate_faces(face_img_gray)
-        # 预测结果线性加权
+        faces_img_gray = generate_faces(face_img_gray)# 预测结果线性加权
         results = model.predict(faces_img_gray)
         result_sum = np.sum(results, axis=0).reshape(-1)
         label_index = np.argmax(result_sum, axis=0)
         emotion = index2emotion(label_index, 'en')  #本来就是显示的英文
-        
         cv2.rectangle(img, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
         img = cv2_img_add_text(img, emotion, x + 30, y + 30, font_color, 20)
         emotions.append(emotion)
@@ -94,9 +88,9 @@ def predict_expression(img_path, model):    #这个部分是最重要的，这�
     if not os.path.exists("./output"):
         os.makedirs("./output")
     cv2.imwrite('./output/rst.png', img)
-    #print(str(emotions[0])+'ffff')
-    return emotions[0], result_possibilities[0]  #这个地方就是可以传递数据的，在这个地方下手  这里传递的是第一个图像观察到的人脸图像
-                                                #但是这里的img会随着遍历进行改变，那img应该就是最后一个人脸而已，这里应该是有问题的,result_possibility是一个列表
+    return emotions[0], result_possibilities[0] 
+    #这个地方就是可以传递数据的，在这个地方下手  这里传递的是第一个图像观察到的人脸图像
+    #但是这里的img会随着遍历进行改变，那img应该就是最后一个人脸而已，这里应该是有问题的,result_possibility是一个列表
 
 if __name__ == '__main__':
     from model import CNN3

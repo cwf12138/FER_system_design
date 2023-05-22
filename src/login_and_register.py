@@ -90,10 +90,8 @@ class LoginWindow(QWidget):
         self.hide()
         windowRegister.show()
     def login_in(self):
-
         number = self.txt_username.text()
         password = self.txt_password.text()
-        
         # Perform sign in authentication here
         # You can use the entered username and password for authentication
         data={'number':number,'password':password}
@@ -103,8 +101,6 @@ class LoginWindow(QWidget):
         self.msg=datas['msg']
         self.flag=datas['flag']
         self.lbl_message.setText(self.msg)
-        print(self.msg)
-        print(self.flag)
         if self.flag=='1':
             self.hide()
             window=MainWindow(load_model(),number,self)
