@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel,QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPainter, QPainterPath
 from PyQt5.QtWidgets import QLabel, QWidget, QHBoxLayout, QApplication
-from qt_material import apply_stylesheet
+from qt_material import apply_stylesheet       #这个文件部分也是暂时没有用      
 class Return_to_home(QWidget):
     def __init__(self):
         super().__init__()

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QFrame,QSizePolicy
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PyQt5.QtCore import Qt, QMargins,QRectF
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter,QFont,QColor
 import random
 class BarChart(QWidget):
     def __init__(self, x, y):
@@ -15,10 +15,16 @@ class BarChart(QWidget):
         # 将条形集合添加到条形系列中
         series = QBarSeries()
         series.append(set0)
+        #series.setBarWidth(0.7)
 
         # 创建水平类别轴并设置类别
         axisX = QBarCategoryAxis()
         axisX.append(x)
+        axisX.setLabelsFont(QFont("Arial", 8))
+        #axisX.setLabelsAngle(-45)
+        #axisX.setLabelsFont(QFont("Arial", 6))  # 设置较小的字体大小
+        #axisX.setLabelsBrush(QColor("#000000"))  # 设置较小的颜色
+
 
         # 创建数值轴并设置范围
         axisY = QValueAxis()
@@ -27,7 +33,7 @@ class BarChart(QWidget):
         # 将类别轴和数值轴添加到图表中
         chart = QChart()
         chart.addSeries(series)
-        chart.setTitle("Emotion Distribution")
+        chart.setTitle("Expression Distribution")
         chart.setAnimationOptions(QChart.SeriesAnimations)
         chart.addAxis(axisX, Qt.AlignBottom)
         chart.addAxis(axisY, Qt.AlignLeft)
@@ -48,7 +54,7 @@ class BarChart(QWidget):
         self.layout = QVBoxLayout(frame)
         self.layout.addWidget(self.chartView)
         #self.layout.addStretch()
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        #self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # 将QFrame设置为主窗口的中央部件
         self.setLayout(self.layout)
@@ -65,5 +71,7 @@ if __name__ == "__main__":
     window = QMainWindow()
     widget = BarChart(x, y)
     window.setCentralWidget(widget)
+    window.setMinimumSize(800, 400)
+    
     window.show()
     app.exec_()

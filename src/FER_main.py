@@ -191,7 +191,7 @@ class MainWindow(QMainWindow):
         #用户下拉菜单
         #drop_down_menu=UserDropDown()
         #返回主页面
-        return_to_home=Return_to_home()
+        #return_to_home=Return_to_home()
         # 创建布局管理器
 
         #左上角返回主页标签 

@@ -35,14 +35,14 @@ class Picture(QWidget):
         self.label_raw_pic = QLabel("NULL")
         #self.label_raw_pic.setGeometry(QRect(10, 30, 320, 240))
         self.label_raw_pic.setStyleSheet("background-color:#bbbbbb;")
-        self.label_raw_pic.setFixedSize(320, 240)
+        self.label_raw_pic.setFixedSize(320, 270)  #240
         self.label_raw_pic.setAlignment(Qt.AlignCenter)      #居中
         #self.label_raw_pic.setObjectName("label_raw_pic")
         # 结果图无图时显示的label      #懂了，就是左下部分那个深灰色小方框
         self.label_result_pic = QLabel("NULL")
         #self.label_raw_pic.setGeometry(QRect(10, 30, 320, 240))
         self.label_result_pic.setStyleSheet("background-color:#bbbbbb;")
-        self.label_result_pic.setFixedSize(320, 240)
+        self.label_result_pic.setFixedSize(320, 270) #240
         self.label_result_pic.setAlignment(Qt.AlignCenter)      #居中
 
         # 原图下方分割线
@@ -171,16 +171,19 @@ class Picture(QWidget):
 
     def show_raw_img(self, filename):   #这个部分就是显示图片并更改了大小   #?这个部分是值得参考的，hh
         img = cv2.imread(filename)
-        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小  320 240
+        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 270)) #修改大小  320 240   320 280
         self.label_raw_pic.setPixmap(QtGui.QPixmap.fromImage(
                     QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))  
                                         #这里相当于就是显示图片
     def show_result_img(self, filename):   #这个部分就是显示图片并更改了大小  结果图
         img = cv2.imread(filename)
-        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 240)) #修改大小  320 240
+        frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (320, 270)) #修改大小  320 240 320 280
         self.label_result_pic.setPixmap(QtGui.QPixmap.fromImage(
                     QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],QtGui.QImage.Format_RGB888)))    #这里相当于就是显示图片
-    
+    def show_test_img(self,filename):
+        pixmap = QPixmap(filename)
+        pixmap = pixmap.scaled(320, 270) 
+        self.label_result_pic.setPixmap(pixmap)
     def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         #print(emotion)

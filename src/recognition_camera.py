@@ -191,20 +191,12 @@ class Camera(QWidget):
         qtRectangle.moveCenter(centerPoint)
         self.move(qtRectangle.topLeft())
         #self.show()
-    def predict_expression_test(self):   #测试暂停键和关闭键是否成功,已成功
-        #model = load_model()
-        border_color = (0, 0, 0)  # 黑框框
-        font_color = (255, 255, 255)  # 白字字
-        #if filename:
-            #self.capture = cv2.VideoCapture(filename)
-        
+    def predict_expression_test(self): 
+        border_color = (0, 0, 0)  
+        font_color = (255, 255, 255)  
         _, frame = self.capture.read()  # 读取一帧视频，返回是否到达视频结尾的布尔值和这一帧的图像
-            #frame = cv2.cvtColor(cv2.resize(frame, (800, 600)), cv2.COLOR_BGR2RGB)
         frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # 灰度化
-            # cascade = cv2.CascadeClassifier('./dataset/params/haarcascade_frontalface_alt.xml')  # 检测人脸
-            # # 利用分类器识别出哪个区域为人脸
-            # faces = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(120, 120))
         emotions = []
         result_possibilities = []
         faces = blaze_detect(frame)
@@ -213,29 +205,23 @@ class Camera(QWidget):
                 face = frame_gray[y: y + h, x: x + w]  # 脸部图片
                 faces = generate_faces(face)
                 results = self.model.predict(faces)
-                result_sum = np.sum(results, axis=0).reshape(-1) #这里也可以加一个概率统计 ，frame 和 possibilities
+                result_sum = np.sum(results, axis=0).reshape(-1) 
                 label_index = np.argmax(result_sum, axis=0)
                 emotion = index2emotion(label_index,'en')  #*这里可以注意一下
                 cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
                 frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
                 emotions.append(emotion)
                 result_possibilities.append(result_sum)
-                    # puttext中文显示问题
-                    # cv2.putText(frame, emotion, (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, font_color, 4)
         qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
-        if len(emotions)!=0:  #修复了emotions列表可能为空并出现IndexError: list index out of range的bug
+        if len(emotions)!=0:  
             self.emotion=emotions[0]
         if len(result_possibilities)!=0:
             self.result_possibility=result_possibilities[0]
-        
-            # 将 QImage 对象转换为 QPixmap 对象
-        #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
-        pixmap = QPixmap.fromImage(qImg)    
-            # 在标签上显示图像
-        self.label_video.setPixmap(pixmap)
-        #self.vbox_right.removeWidget(self.barchart)
-        #self.barchart=BarChart(xemotions,list(self.result_possibility))
-        #self.vbox_right.addWidget(self.barchart)
+        pixmap = QPixmap.fromImage(qImg)     # 将 QImage 对象转换为 QPixmap 对象
+        self.label_video.setPixmap(pixmap)  # 在标签上显示图像
+       #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
+
+       #修复了emotions列表可能为空并出现IndexError: list index out of range的bug
     def show_emotion(self, emotion):  #展示结果   也是可以借鉴的hh
         # 显示表情名
         if len(emotion)==0:

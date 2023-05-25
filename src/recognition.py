@@ -82,7 +82,7 @@ def predict_expression(img_path, model):    #这个部分是最重要的，这�
         label_index = np.argmax(result_sum, axis=0)
         emotion = index2emotion(label_index, 'en')  #本来就是显示的英文
         cv2.rectangle(img, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
-        img = cv2_img_add_text(img, emotion, x + 30, y + 30, font_color, 20)
+        img = cv2_img_add_text(img, emotion, x + 30, y + 30, font_color, 40)#20
         emotions.append(emotion)
         result_possibilities.append(result_sum)
     if not os.path.exists("./output"):

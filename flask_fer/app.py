@@ -44,7 +44,6 @@ class Register(Resource):
     def post(self):
         number=request.json['number']
         password=request.json['password']
-        #name=request.json['username']
         hash_password=generate_password_hash(password, method='sha256')
         user=User.query.filter(User.number==number).first()
         if not user :
