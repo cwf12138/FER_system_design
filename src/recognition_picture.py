@@ -140,26 +140,16 @@ class Picture(QWidget):
        
     #添加文字信息
     def open_file_browser(self):
-        # 加载模型
-        file_name, file_type = QtWidgets.QFileDialog.getOpenFileName(caption="选取图片", directory="./input/test/",
-                                                                     filter="All Files (*);;Text Files (*.txt)")
-        # 显示原图
+        file_name, file_type = QtWidgets.QFileDialog.getOpenFileName(
+        caption="选取图片", directory="./input/test/",filter="All Files (*);;Text Files (*.txt)")
         if file_name is not None and file_name != "":
-            #这里有一个巨坑的地方，用绝对路径无法正常插入msyql数据库中，只能通过相对路径
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            print(current_dir)
-            relative_path = os.path.relpath(file_name, current_dir)  #这也太强了，之间转换成windows的路径格式
-            #这里可以已经不需要相对路径了，
-            #self.filename=relative_path
             self.filename=file_name
             self.show_raw_img(file_name)  
-            emotion, possibility = predict_expression(file_name, self.model)  #这里predict_expression一个是在recognition.py文件里面实现好了的
-           # print(emotion)  这里已经是英文了
+            emotion, possibility = predict_expression(file_name, self.model)  
             file_name_result='./output/rst.png'
             self.show_result_img(file_name_result)
             self.emotion=emotion
             self.possibility=possibility
-            #self.barchar=BarChart(xemotions,self.possibility)
             self.vbox_right.removeWidget(self.barchart)
             self.barchart=BarChart(xemotions,list(self.possibility))
             self.vbox_right.addWidget(self.barchart)
@@ -167,7 +157,16 @@ class Picture(QWidget):
             url='http://127.0.0.1:5000/add_picture_record/'
             data={"number":self.number,'result':self.emotion,'picture_address':self.filename}
             response = requests.post(url, json=data)
-
+    def show_results(self, emotion, possibility):  
+        self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
+        if emotion != 'no':
+            img = cv2.imread('./assets/icons/' + str(emotion) + '.png')    
+            frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (100, 100))  
+            self.label_rst.setPixmap(QtGui.QPixmap.fromImage(
+                QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
+                             QtGui.QImage.Format_RGB888)))
+        else:
+            self.label_rst.setText(QtCore.QCoreApplication.translate("Form", "no result"))  
 
     def show_raw_img(self, filename):   #这个部分就是显示图片并更改了大小   #?这个部分是值得参考的，hh
         img = cv2.imread(filename)
@@ -184,19 +183,7 @@ class Picture(QWidget):
         pixmap = QPixmap(filename)
         pixmap = pixmap.scaled(320, 270) 
         self.label_result_pic.setPixmap(pixmap)
-    def show_results(self, emotion, possibility):  #展示结果   也是可以借鉴的hh
-        # 显示表情名
-        #print(emotion)
-        self.label_emotion.setText(QtCore.QCoreApplication.translate("Form", emotion))
-        # 显示emoji
-        if emotion != 'no':
-            img = cv2.imread('./assets/icons/' + str(emotion) + '.png')    #这里是iemoji表情的路径
-            frame = cv2.resize(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), (100, 100))  #修改大小
-            self.label_rst.setPixmap(QtGui.QPixmap.fromImage(
-                QtGui.QImage(frame.data, frame.shape[1], frame.shape[0], 3 * frame.shape[1],
-                             QtGui.QImage.Format_RGB888)))
-        else:
-            self.label_rst.setText(QtCore.QCoreApplication.translate("Form", "no result"))  #翻译
+   
         # 显示直方图
        # self.show_bars(list(possibility))
 

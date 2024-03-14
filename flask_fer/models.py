@@ -2,7 +2,6 @@ from external import db
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
-
 class User(db.Model):
     __tablename__="user"
     uid = db.Column(db.Integer, primary_key=True, autoincrement=True) 
@@ -21,7 +20,6 @@ class Picture_FER_Usage_Record(db.Model):
     result = db.Column(db.String(50))
     picturetime =  db.Column(db.DateTime, default=datetime.now)
     picture_address = db.Column(db.String(500))
-
 
 class Video_FER_Usage_Record(db.Model):
     __tablename__="video"

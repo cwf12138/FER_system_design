@@ -20,7 +20,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel,QDesktopWidget,QHB
 from PyQt5.QtCore import QObject, pyqtSignal,Qt, QTimer,QSize,QCoreApplication
 from qt_material import apply_stylesheet
 from qtchart_widget import BarChart
-
+import gc
+gc.collect()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--source", type=int, default=0, help="data source, 0 for camera 1 for video")
@@ -98,6 +99,7 @@ class Camera(QWidget):
         self.label_chart=QLabel('chart')
         self.setObjectName=("FER")
         #self.video_capture = video_capture
+        gc.collect()
         self.initUI()
 
 
@@ -107,7 +109,8 @@ class Camera(QWidget):
         # 定义一个定时器
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.predict_expression_test)   
-        self.timer.timeout.connect(lambda:self.show_emotion(self.emotion))
+        #self.timer.timeout.connect(lambda:self.show_emotion(self.emotion))
+        self.timer.timeout.connect(self.show_emotion_timeout)
         #lambda:child_window.show()
         self.show_emotion(self.emotion)
 
@@ -183,7 +186,7 @@ class Camera(QWidget):
         #print(self.filename)
         if self.filename:
             self.capture = cv2.VideoCapture(self.filename)
-        self.timer.start(30)
+        self.timer.start(30)   #时间间隔
         
         #居中显示
         qtRectangle = self.frameGeometry()
@@ -198,27 +201,25 @@ class Camera(QWidget):
         frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # 灰度化
         emotions = []
-        result_possibilities = []
-        faces = blaze_detect(frame)
+        faces = blaze_detect(frame)  #人脸检测
         if faces is not None and len(faces) > 0:
             for (x, y, w, h) in faces:
-                face = frame_gray[y: y + h, x: x + w]  # 脸部图片
+                face = frame_gray[y: y + h, x: x + w]   #脸部图片
                 faces = generate_faces(face)
                 results = self.model.predict(faces)
                 result_sum = np.sum(results, axis=0).reshape(-1) 
                 label_index = np.argmax(result_sum, axis=0)
-                emotion = index2emotion(label_index,'en')  #*这里可以注意一下
-                cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2)
-                frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)   #*这里也是
+                emotion = index2emotion(label_index,'en')  
+                cv2.rectangle(frame, (x - 10, y - 10), (x + w + 10, y + h + 10), border_color, thickness=2) 
+                frame = cv2_img_add_text(frame, emotion, x+30, y+30, font_color, 20)  
                 emotions.append(emotion)
-                result_possibilities.append(result_sum)
         qImg = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         if len(emotions)!=0:  
             self.emotion=emotions[0]
-        if len(result_possibilities)!=0:
-            self.result_possibility=result_possibilities[0]
-        pixmap = QPixmap.fromImage(qImg)     # 将 QImage 对象转换为 QPixmap 对象
-        self.label_video.setPixmap(pixmap)  # 在标签上显示图像
+        pixmap = QPixmap.fromImage(qImg)    
+        self.label_video.setPixmap(pixmap)  
+
+
        #QPixmap类用于绘图设备的图像显示，它可以作为一个QPainterDevice对象，也可以加载到一个控件中，通常是标签或者按钮，用于在标签或按钮上显示图像
 
        #修复了emotions列表可能为空并出现IndexError: list index out of range的bug
@@ -240,6 +241,8 @@ class Camera(QWidget):
         #self.barchart=BarChart(x,list(self.result_possibility))
         #print(self.result_possibility)
         # 显示直方图
+    def show_emotion_timeout(self):
+        self.show_emotion(self.emotion)
     def play_pause_video(self):
         """开始/暂停视频流的播放"""
         if not self.timer.isActive():
@@ -263,10 +266,16 @@ class Camera(QWidget):
         self.capture.release()
         #cv2.destroyAllWindows()
         event.accept()
+    
+    def stop_camera(self):
+        self.timer.timeout.disconnect(self.predict_expression_test)
+        self.timer.timeout.disconnect(self.show_emotion_timeout)
+        if self.capture is not None:
+            self.capture.release()  # 关闭摄像头
 
-
-
-
+    def deleteLater(self):
+        self.stop_camera()  # 在删除页面对象之前关闭摄像头
+        super().deleteLater()
     
 
 def predict_expression():
